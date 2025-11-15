@@ -11,7 +11,17 @@ class TestCocomo(unittest.TestCase):
         est: float = schedule_estimate(size, em_prod, sf_sum)
         self.assertAlmostEqual(586.61, est, places=2)
 
-
+    def test_calculate_ufp(self):
+        counts = {
+            "EI": (5, 10, 2),
+            "EO":  (3, 8, 1),
+            "ILF": (6, 17, 8),
+            "EIF": (10, 10, 5),
+            "EQ":  (2, 5, 0),
+        }
+        
+        ufp = calculate_ufp(counts)
+        self.assertEqual(654, ufp)
 
 if __name__ == "__main__":
     unittest.main()

@@ -11,3 +11,4 @@ WEIGHTS: dict[str, tuple[int, int, int]] = {
     "EIF": (5, 7, 10),     # External Interfaces Files
     "EQ":  (3, 4, 6),      # External Inquiries
 }
+

@@ -20,8 +20,15 @@ class TestCocomo(unittest.TestCase):
             "EQ":  (2, 5, 0),
         }
         
-        ufp = calculate_ufp(counts)
+        ufp: int = calculate_ufp(counts)
         self.assertEqual(654, ufp)
+
+    def test_ufp_to_sloc(self):
+        sloc = ufp_to_sloc(100, "C")
+        self.assertEqual(12_800, sloc)
+
+
+
 
 if __name__ == "__main__":
     unittest.main()

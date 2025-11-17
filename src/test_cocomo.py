@@ -24,7 +24,7 @@ class TestCocomo(unittest.TestCase):
         self.assertEqual(654, ufp)
 
     def test_ufp_to_sloc(self):
-        sloc = ufp_to_sloc(100, "C")
+        sloc: int = ufp_to_ksloc(100, "C")
         self.assertEqual(12_800, sloc)
 
 

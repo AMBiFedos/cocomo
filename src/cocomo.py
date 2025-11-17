@@ -10,6 +10,7 @@ class CsciParent(Csci):
     def __init__(self, title: str, children: list[Csci]=[]):
         super().__init__(title)
         self.children: list[Csci] = children
+        self.nominal_schedule: float = 0.0
 
     def add_child(self, child:Csci) -> None:
         if child not in self.children:
@@ -18,16 +19,13 @@ class CsciParent(Csci):
     def remove_child(self, child: Csci) -> Csci:
         for i in range(0, len(self.children)):
             if self.children[i] is child:
-                return self.children.pop(i)
-        
+                return self.children.pop(i)      
         return None
-
-    def estimate_schedule(self) -> float:
-        self.nominal_schedule: float = 0
-        for child in self.children:
-            self.nominal_schedule += child.nominal_schedule
+    
+    def update_schedule_estimate(self, child_estimate: float):
+        self.nominal_schedule += child_estimate
         
-        return nominal_schedule
+        
 
 class CsciChild(Csci):
     def __init__(self, title, str, parent: CsciParent=None):

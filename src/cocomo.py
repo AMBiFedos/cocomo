@@ -28,15 +28,19 @@ class CsciParent(Csci):
     def update_schedule_estimate(self, child_estimate: float):
         self.nominal_schedule += child_estimate
         
-        
 class CsciChild(Csci):
     def __init__(self, title: str, parent: Union[CsciParent, None]=None):
         super().__init__(title)
-        self.parent = parent        
+        self.size = 100
+        self.em_prod: float = 1.0
+        self.sf_sum: float = 24.0
         
-    def estimate_schedule(self, ksloc: int, em_prod: float, sf_sum: float) -> float:
-        E: float = B + 0.01 * sf_sum
-        self.nominal_schedule = A * ksloc**E * em_prod
+        self.parent = parent
+        parent.add_child(self)
+        
+    def estimate_schedule(self) -> float:
+        E: float = B + 0.01 * self.sf_sum
+        self.nominal_schedule = A * self.ksloc**E * self.em_prod
         return self.nominal_schedule
 
     def calculate_ufp(self, function_point_counts: dict[str, tuple[int, int, int]]) -> int:

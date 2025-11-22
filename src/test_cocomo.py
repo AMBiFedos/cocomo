@@ -4,14 +4,17 @@ from cocomo import *
 
 class TestCocomo(unittest.TestCase):
     def test_schedule_estimate_avg(self):
-        size: int = 100
-        em_prod: float = 1.0
-        sf_sum: float = 24.0
+        root: CsciParent = CsciParent("Test")
+        csci: CsciChild = CsciChild("Test CSCI", root)
+        csci.size = 100
+        csci.em_prod = 1.0
+        csci.sf_sum = 24.0
         
-        est: float = schedule_estimate(size, em_prod, sf_sum)
+        est: float = csci.schedule_estimate()
         self.assertAlmostEqual(586.61, est, places=2)
 
     def test_calculate_ufp(self):
+        
         counts = {
             "EI": (5, 10, 2),
             "EO":  (3, 8, 1),

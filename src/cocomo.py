@@ -35,6 +35,7 @@ class CsciChild(Csci):
         self.em_prod: float = 1.0
         self.sf_sum: float = 24.0
         self.function_points: int = 0
+        self.nominal_schedule = 0.0
         
         self.parent = parent
         parent.add_child(self)
@@ -42,7 +43,7 @@ class CsciChild(Csci):
     def estimate_schedule(self) -> float:
         E: float = B + 0.01 * self.sf_sum
         self.nominal_schedule = A * self.ksloc**E * self.em_prod
-        return self.nominal_schedule
+        
 
     def calculate_ufp(self, function_point_counts: dict[str, tuple[int, int, int]]) -> None:
         fp: int = 0

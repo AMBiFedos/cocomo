@@ -19,7 +19,6 @@ class CsciParent(Csci):
         
         self.nominal_schedule += child.nominal_schedule
         
-        
     def remove_child(self, child: Csci) -> Union[Csci, None]:
         
         for i in range(0, len(self.children)):
@@ -27,10 +26,6 @@ class CsciParent(Csci):
                 self.nominal_schedule -= child.nominal_schedule
                 return self.children.pop(i)      
         return None
-    
-    
-    def update_schedule_estimate(self, child_estimate: float):
-        self.nominal_schedule += child_estimate
         
 class CsciChild(Csci):
     def __init__(self, title: str, parent: Union[CsciParent, None]=None):
@@ -45,6 +40,12 @@ class CsciChild(Csci):
         self.parent = parent
         parent.add_child(self)
         
+    def change_parent(self, new_parent: CsciParent) -> None:
+        new_parent.add_child(self)
+        self.parent.remove_child(self)
+        self.parent = new_parent
+    
+    
     def estimate_schedule(self) -> float:
         E: float = B + 0.01 * self.sf_sum
         self.nominal_schedule = A * self.ksloc**E * self.em_prod

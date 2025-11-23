@@ -36,6 +36,7 @@ class CsciChild(Csci):
         self.sf_sum: float = 24.0
         self.function_points: int = 0
         self.nominal_schedule = 0.0
+        self.language = "C"
         
         self.parent = parent
         parent.add_child(self)
@@ -53,12 +54,11 @@ class CsciChild(Csci):
 
         self.function_points = fp
 
-    def ufp_to_ksloc(self, ufp: int, language: str) -> int:
-        ratios = {}
+    def ufp_to_ksloc(self) -> None:
+        ratios: dict[str, int] = {}
         with open("data/ufp_to_sloc_ratios.json") as json_file:
             ratios = json.load(json_file)
         
-        self.ksloc = ufp * ratios[language]
-        return self.ksloc
+        self.ksloc = self.function_points * ratios[self.language]
 
     # def get_equivalent_ksloc(adapted_ksloc: int, at: int, ) ->

@@ -17,10 +17,14 @@ class CsciParent(Csci):
         if child not in self.children:
             self.children.append(child)
         
+        self.nominal_schedule += child.nominal_schedule
+        
+        
     def remove_child(self, child: Csci) -> Union[Csci, None]:
         
         for i in range(0, len(self.children)):
             if self.children[i] is child:
+                self.nominal_schedule -= child.nominal_schedule
                 return self.children.pop(i)      
         return None
     

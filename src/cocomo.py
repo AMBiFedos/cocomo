@@ -34,6 +34,7 @@ class CsciChild(Csci):
         self.size = 100
         self.em_prod: float = 1.0
         self.sf_sum: float = 24.0
+        self.function_points: int = 0
         
         self.parent = parent
         parent.add_child(self)
@@ -43,13 +44,13 @@ class CsciChild(Csci):
         self.nominal_schedule = A * self.ksloc**E * self.em_prod
         return self.nominal_schedule
 
-    def calculate_ufp(self, function_point_counts: dict[str, tuple[int, int, int]]) -> int:
-        total_fp:int = 0
+    def calculate_ufp(self, function_point_counts: dict[str, tuple[int, int, int]]) -> None:
+        fp: int = 0
 
         for function_point in function_point_counts:
-            total_fp += sum(tuple(count * weight for count, weight in zip(function_point_counts[function_point], WEIGHTS[function_point])))
+            fp += sum(tuple(count * weight for count, weight in zip(function_point_counts[function_point], WEIGHTS[function_point])))
 
-        return total_fp
+        self.function_points = fp
 
     def ufp_to_ksloc(self, ufp: int, language: str) -> int:
         ratios = {}

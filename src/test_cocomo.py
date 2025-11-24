@@ -3,17 +3,18 @@ from cocomo import *
 
 
 class TestCocomo(unittest.TestCase):
-    def test_schedule_estimate_avg(self):
-        root: CsciParent = CsciParent("Test")
-        csci: CsciChild = CsciChild("Test CSCI", root)
-        csci.size = 100
-        csci.em_prod = 1.0
-        csci.sf_sum = 24.0
+    
+    def test_csci_child_estimate_schedule(self):
+        child: CsciChild = CsciChild("Test CSCI")
+        child.ksloc = 100
+        child.em_prod = 1.0
+        child.sf_sum = 24.0
         
-        est: float = csci.schedule_estimate()
-        self.assertAlmostEqual(586.61, est, places=2)
+        child.estimate_schedule()
+        self.assertAlmostEqual(586.61, child.nominal_schedule, places=2)
 
-    def test_calculate_ufp(self):
+    def test_calculate_function_points(self):
+        child: CsciChild = CsciChild("Test CSCI")
         
         counts = {
             "EI": (5, 10, 2),
@@ -23,12 +24,15 @@ class TestCocomo(unittest.TestCase):
             "EQ":  (2, 5, 0),
         }
         
-        ufp: int = calculate_ufp(counts)
-        self.assertEqual(654, ufp)
+        child.calculate_function_points(counts)
+        self.assertEqual(654, child.function_points)
 
-    def test_ufp_to_sloc(self):
-        sloc: int = ufp_to_ksloc(100, "C")
-        self.assertEqual(12_800, sloc)
+    def test_function_points_to_ksloc(self):
+        child: CsciChild = CsciChild("Test CSCI")
+        child.function_points = 100
+        child.language = "C"
+        child.function_points_to_ksloc()
+        self.assertEqual(12_800, child.ksloc)
 
 
 

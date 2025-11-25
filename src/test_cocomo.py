@@ -12,6 +12,9 @@ class TestCocomo(unittest.TestCase):
         
         child.estimate_schedule()
         self.assertAlmostEqual(586.61, child.nominal_schedule, places=2)
+        
+
+    
 
     def test_calculate_function_points(self):
         child: CsciChild = CsciChild("Test CSCI")

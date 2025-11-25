@@ -5,27 +5,33 @@ from constants import *
 class Csci:
     def __init__(self, title: str):
         self.title = title
+        self.nominal_schedule: float = 0.0
+        self.parent = None
         
-
+    
 class CsciParent(Csci):
     def __init__(self, title: str, children: list[Csci]=[]):
         super().__init__(title)
         self.children: list[Csci] = children
-        self.nominal_schedule: float = 0.0
 
     def add_child(self, child:Csci) -> None:
         if child not in self.children:
             self.children.append(child)
         
-        self.nominal_schedule += child.nominal_schedule
+        self.__private_update_estimate_schedule(child.nominal_schedule)
         
     def remove_child(self, child: Csci) -> Union[Csci, None]:
         
         for i in range(0, len(self.children)):
             if self.children[i] is child:
-                self.nominal_schedule -= child.nominal_schedule
+                self.__private_update_estimate_schedule(-child.nominal_schedule)
                 return self.children.pop(i)      
         return None
+    
+    def __private_update_estimate_schedule(self, add_schedule: float) -> None:
+        self.nominal_schedule += add_schedule
+        if self.parent is not None:
+            self.parent.__private_update_estimate_schedule(self.nominal_schedule)
         
 class CsciChild(Csci):
     def __init__(self, title: str, parent: Union[CsciParent, None]=None):
@@ -34,7 +40,6 @@ class CsciChild(Csci):
         self.em_prod: float = 1.0
         self.sf_sum: float = 24.0
         self.function_points: int = 0
-        self.nominal_schedule = 0.0
         self.language = "C"
         
         self.parent = parent
@@ -47,10 +52,11 @@ class CsciChild(Csci):
             self.parent.remove_child(self)
             self.parent = new_parent
     
-    
     def estimate_schedule(self) -> float:
         E: float = B + 0.01 * self.sf_sum
         self.nominal_schedule = A * self.ksloc**E * self.em_prod
+        if self.parent is not None:
+            self.parent.__private_update_estimate_schedule(self.nominal_schedule)
         
 
     def calculate_function_points(self, function_counts: dict[str, tuple[int, int, int]]) -> None:

@@ -22,16 +22,12 @@ class Module:
         fp: int = 0
 
         for count in function_counts:
-            fp += sum(tuple(count * weight for count, weight in zip(function_counts[count], WEIGHTS[count])))
+            fp += sum(tuple(count * weight for count, weight in zip(function_counts[count], FUNCTION_POINT_WEIGHTS[count])))
 
         self.function_points = fp
 
     def function_points_to_ksloc(self) -> None:
-        ratios: dict[str, int] = {}
-        with open("data/ufp_to_ksloc_ratios.json") as json_file:
-            ratios = json.load(json_file)
-        
-        self.ksloc = self.function_points * ratios[self.language]
+        self.ksloc = self.function_points * FUNCTION_POINT_LANGUAGE_RATIOS[self.language]
 
 class Project:
     def __init__(self, name: str):

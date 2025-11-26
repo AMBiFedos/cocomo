@@ -12,10 +12,33 @@ class RatingLevel(Enum):
     NOMINAL     = "Nominal"
     HIGH        = "High"
     VERY_HIGH   = "Very High"
-    
-    
-    
-    
+
+class ScaleFactors(Enum):
+    PREC = "Precedentedness"
+    FLEX = "Development Flexibility"
+    RESL = "Risk Resolution"
+    TEAM = "Team Cohesion"
+    PMAT = "Process Maturity"
+
+class EffortModifiers(Enum):
+    RELY = "Required Reliability"
+    DATA = "Database Size"
+    CPLX = "Product Complexity"
+    RUSE = "Developed for Reuse"
+    DOCU = "Documentation  Match to Lifecycle"
+    TIME = "Execution Time Constraint"
+    STOR = "Main Storage Constraint"
+    PVOL = "Platform Volatility"
+    ACAP = "Analyst Capability"
+    PCAP = "Programmer Capability"
+    PCON = "Personnel Continuity"
+    APEX = "Applications Experience"
+    PLEX = "Platform Experience"
+    LTEX = "Language and Tool Experience"
+    TOOL = "Use of Software Tools"
+    SITE = "Multisite Development"
+    SCED = "Required Development Schedule"
+
 FUNCTION_POINT_WEIGHTS: dict[str, tuple[int, int, int]] = {
     "EI":  (3, 4, 6),      # External Inputs
     "EO":  (4, 5, 7),      # External Outputs

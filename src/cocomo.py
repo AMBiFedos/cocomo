@@ -1,21 +1,18 @@
 from typing import Union
 import json
 from constants import *
-from cocomo_enums import RatingLevel
-
 
 class Module:
     def __init__(self, name: str):
         self.name = name
         self.ksloc = 0
         self.em_prod: float = 1.0
-        self.sf_sum: float = 24.0
         self.function_points: int = 0
         self.language = "C"
         self.nominal_schedule = 0
 
-    def estimate_schedule(self):
-        E: float = B + 0.01 * self.sf_sum
+    def estimate_schedule(self, scale_factor: int):
+        E: float = B + 0.01 * scale_factor
         self.nominal_schedule = A * self.ksloc**E * self.em_prod
 
     def calculate_function_points(self, function_counts: dict[str, tuple[int, int, int]]) -> None:
@@ -33,12 +30,13 @@ class Project:
     def __init__(self, name: str):
         self.name = name
 
-        self.scale_factors: dict[str, str] = {"PREC": RatingLevel.NOMINAL,
-                                              "FLEX": RatingLevel.NOMINAL,
-                                              "RESL": RatingLevel.NOMINAL,
-                                              "TEAM": RatingLevel.NOMINAL,
-                                              "PMAT": RatingLevel.NOMINAL,
-                                              }
+        self.scale_factors: dict[str, str] = {
+            "PREC": RatingLevel.NOMINAL,
+            "FLEX": RatingLevel.NOMINAL,
+            "RESL": RatingLevel.NOMINAL,
+            "TEAM": RatingLevel.NOMINAL,
+            "PMAT": RatingLevel.NOMINAL,
+            }
 
         self.modules: list[Module] = []
 

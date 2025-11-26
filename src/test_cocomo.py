@@ -2,9 +2,9 @@ import unittest
 from cocomo import *
 
 
-class TestCocomo(unittest.TestCase):
+class TestCocomoModule(unittest.TestCase):
     
-    def test_module_estimate_schedule(self):
+    def test_estimate_schedule(self):
         module: Module = Module("<--test-->")
         module.ksloc = 100
         module.em_prod = 1.0
@@ -34,6 +34,52 @@ class TestCocomo(unittest.TestCase):
         module.function_points_to_ksloc()
         self.assertEqual(12_800, module.ksloc)
 
+class TestCocomoProject(unittest.TestCase):
+    
+    def test_add_module_no_position(self):
+        module: Module = Module("<--test module-->")
+        project: Project = Project("<--test project-->")
+        project.add_module(module)
+        self.assertListEqual([module], project.modules)
+    
+    def test_add_module_specific_position(self):
+        module1: Module = Module("module 1")
+        module2: Module = Module("module 2")
+        project: Project = Project("project")
+        
+        project.add_module(module1)
+        project.add_module(module2, 0)
+        
+        self.assertListEqual([module2, module1], project.modules)
+
+
+    def test_remove_module(self):
+        module1: Module = Module("module 1")
+        module2: Module = Module("module 2")
+        project: Project = Project("project")
+        
+        project.add_module(module1)
+        project.add_module(module2)
+
+        self.assertListEqual([module1, module2], project.modules)
+        
+        project.remove_module(0)
+
+        self.assertListEqual([module2], project.modules)
+
+    def test_move_module(self):
+        module1: Module = Module("module 1")
+        module2: Module = Module("module 2")
+        project: Project = Project("project")
+        
+        project.add_module(module1)
+        project.add_module(module2)
+
+        self.assertListEqual([module1, module2], project.modules)
+
+        project.move_module(1, 0)
+
+        self.assertListEqual([module2, module1], project.modules)
 
 
 

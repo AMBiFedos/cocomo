@@ -47,10 +47,6 @@ class Project:
             else:
                 self.modules.insert(position, module)
 
-            if module.nominal_schedule == 0:
-                module.estimate_schedule
-
-
     def remove_module(self, position: int) -> None:
         self.modules.pop(position)
     

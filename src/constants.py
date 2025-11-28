@@ -12,15 +12,16 @@ class RatingLevel(Enum):
     NOMINAL     = "Nominal"
     HIGH        = "High"
     VERY_HIGH   = "Very High"
+    EXTRA_HIGH  = "Extra High"
 
-class ScaleFactors(Enum):
+class ScaleFactor(Enum):
     PREC = "Precedentedness"
     FLEX = "Development Flexibility"
     RESL = "Risk Resolution"
     TEAM = "Team Cohesion"
     PMAT = "Process Maturity"
 
-class EffortModifiers(Enum):
+class EffortModifier(Enum):
     RELY = "Required Reliability"
     DATA = "Database Size"
     CPLX = "Product Complexity"
@@ -38,6 +39,74 @@ class EffortModifiers(Enum):
     TOOL = "Use of Software Tools"
     SITE = "Multisite Development"
     SCED = "Required Development Schedule"
+
+SCALE_FACTOR_COST_DRIVERS = {
+    EffortModifier.RELY: {RatingLevel.VERY_LOW: 0.82, RatingLevel.LOW: 0.92, RatingLevel.NOMINAL: 1.00, RatingLevel.HIGH: 1.10, RatingLevel.HIGH: 1.26},
+    EffortModifier.DATA: {                            RatingLevel.LOW: 0.90, RatingLevel.NOMINAL: 1.00, RatingLevel.HIGH: 1.14, RatingLevel.HIGH: 1.28},
+    EffortModifier.CPLX: {RatingLevel.VERY_LOW: 0.73, RatingLevel.LOW: 0.87, RatingLevel.NOMINAL: 1.00, RatingLevel.HIGH: 1.17, RatingLevel.VERY_HIGH: 1.34, RatingLevel.EXTRA_HIGH: 1.74},
+    EffortModifier.RUSE: {                            RatingLevel.LOW: 0.95, RatingLevel.NOMINAL: 1.00, RatingLevel.HIGH: 1.07, RatingLevel.VERY_HIGH: 1.15, RatingLevel.EXTRA_HIGH: 1.24},
+    EffortModifier.DOCU: {RatingLevel.VERY_LOW: 0.81, RatingLevel.LOW: 0.91, RatingLevel.NOMINAL: 1.00, RatingLevel.HIGH: 1.11, RatingLevel.VERY_HIGH: 1.23},
+    EffortModifier.RELY: {RatingLevel.VERY_LOW: 0.82, RatingLevel.LOW: 0.92, RatingLevel.NOMINAL: 1.00, RatingLevel.HIGH: 1.26, RatingLevel.VERY_HIGH: 1.26},
+    EffortModifier.RELY: {RatingLevel.VERY_LOW: 0.82, RatingLevel.LOW: 0.92, RatingLevel.NOMINAL: 1.00, RatingLevel.HIGH: 1.26, RatingLevel.VERY_HIGH: 1.26},
+    EffortModifier.RELY: {RatingLevel.VERY_LOW: 0.82, RatingLevel.LOW: 0.92, RatingLevel.NOMINAL: 1.00, RatingLevel.HIGH: 1.26, RatingLevel.VERY_HIGH: 1.26},
+    EffortModifier.RELY: {RatingLevel.VERY_LOW: 0.82, RatingLevel.LOW: 0.92, RatingLevel.NOMINAL: 1.00, RatingLevel.HIGH: 1.26, RatingLevel.VERY_HIGH: 1.26},
+    EffortModifier.RELY: {RatingLevel.VERY_LOW: 0.82, RatingLevel.LOW: 0.92, RatingLevel.NOMINAL: 1.00, RatingLevel.HIGH: 1.26, RatingLevel.VERY_HIGH: 1.26},
+    EffortModifier.RELY: {RatingLevel.VERY_LOW: 0.82, RatingLevel.LOW: 0.92, RatingLevel.NOMINAL: 1.00, RatingLevel.HIGH: 1.26, RatingLevel.VERY_HIGH: 1.26},
+    EffortModifier.RELY: {RatingLevel.VERY_LOW: 0.82, RatingLevel.LOW: 0.92, RatingLevel.NOMINAL: 1.00, RatingLevel.HIGH: 1.26, RatingLevel.VERY_HIGH: 1.26},
+    EffortModifier.RELY: {RatingLevel.VERY_LOW: 0.82, RatingLevel.LOW: 0.92, RatingLevel.NOMINAL: 1.00, RatingLevel.HIGH: 1.26, RatingLevel.VERY_HIGH: 1.26},
+    EffortModifier.RELY: {RatingLevel.VERY_LOW: 0.82, RatingLevel.LOW: 0.92, RatingLevel.NOMINAL: 1.00, RatingLevel.HIGH: 1.26, RatingLevel.VERY_HIGH: 1.26},
+    EffortModifier.RELY: {RatingLevel.VERY_LOW: 0.82, RatingLevel.LOW: 0.92, RatingLevel.NOMINAL: 1.00, RatingLevel.HIGH: 1.26, RatingLevel.VERY_HIGH: 1.26},
+    EffortModifier.RELY: {RatingLevel.VERY_LOW: 0.82, RatingLevel.LOW: 0.92, RatingLevel.NOMINAL: 1.00, RatingLevel.HIGH: 1.26, RatingLevel.VERY_HIGH: 1.26},
+}
+
+
+
+
+
+
+
+class Language(Enum):
+    Access = "Access"
+    Ada83 = "Ada 83"
+    Ada95 = "Ada 95"
+    AI_Shell = "AI Shell"
+    APL = "APL"
+    AssemblyBasic = "Assembly - Basic"
+    AssemblyMacro = "Assembly - Macro"
+    BasicANSI = "Basic - ANSI"
+    BasicCompiled = "Basic - Compiled"
+    BasicVisual = "Basic - Visual"
+    VisualBasic5 = "Visual Basic 5.0"
+    C = "C"
+    Cpp = "C++"
+    VisualCpp = "Visual C++"
+    Cobol85 = "Cobol (ANSI 85)"
+    Database = "Database"
+    FirstGenerationLanguage = "First Generation Language"
+    SecondGenerationLanguage = "Second Generation Language"
+    ThirdGenerationLanguage = "Third Generation Language"
+    FourthGenerationLanguage = "Fourth Generation Language"
+    FifthGenerationLanguage = "Fifth Generation Language"
+    Forth = "Forth"
+    Fortran77 = "Fortran 77"
+    Fortran95 = "Fortran 95"
+    HighLevelLanguage = "High Level Language"
+    HTML3 = "HTML 3.0"
+    Java = "Java"
+    Jovial = "Jovial"
+    Lisp = "Lisp"
+    MachineCode = "Machine Code"
+    Modula2 = "Modula 2"
+    Pascal = "Pascal"
+    PERL = "PERL"
+    PowerBuilder = "PowerBuilder"
+    Prolog = "Prolog"
+    Query = "Query"
+    ReportGenerator = "Report Generator"
+    Simulation = "Simulation"
+    Spreadsheet = "Spreadsheet"
+    UnixShellScript = "Unix Shell Script"
+
 
 FUNCTION_POINT_WEIGHTS: dict[str, tuple[int, int, int]] = {
     "EI":  (3, 4, 6),      # External Inputs

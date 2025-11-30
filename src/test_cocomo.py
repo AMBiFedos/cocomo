@@ -1,39 +1,6 @@
 import unittest
 from cocomo import *
 
-
-class TestCocomoModule(unittest.TestCase):
-    
-    def test_estimate_schedule(self):
-        module: Module = Module("<--test-->")
-        module.ksloc = 100
-        module.em_prod = 1.0
-        scale_factor: float = 24.0
-        
-        module.estimate_schedule(scale_factor)
-        self.assertAlmostEqual(586.61, module.nominal_schedule, places=2)
-
-    def test_calculate_function_points(self):
-        module: Module = Module("<--test-->")
-        
-        counts = {
-            "EI": (5, 10, 2),
-            "EO":  (3, 8, 1),
-            "ILF": (6, 17, 8),
-            "EIF": (10, 10, 5),
-            "EQ":  (2, 5, 0),
-        }
-        
-        module.calculate_function_points(counts)
-        self.assertEqual(654, module.function_points)
-
-    def test_function_points_to_ksloc(self):
-        module: Module = Module("<--test-->")
-        module.function_points = 100
-        module.language = "C"
-        module.function_points_to_ksloc()
-        self.assertEqual(12_800, module.ksloc)
-
 class TestCocomoProject(unittest.TestCase):
     
     def test_add_module_no_position(self):
@@ -51,7 +18,6 @@ class TestCocomoProject(unittest.TestCase):
         project.add_module(module2, 0)
         
         self.assertListEqual([module2, module1], project.modules)
-
 
     def test_remove_module(self):
         module1: Module = Module("module 1")
@@ -80,6 +46,52 @@ class TestCocomoProject(unittest.TestCase):
         project.move_module(1, 0)
 
         self.assertListEqual([module2, module1], project.modules)
+
+class TestCocomoModule(unittest.TestCase):
+    
+    def test_estimate_schedule_nominal(self):
+        project: Project = Project("test project")
+        
+        module: Module = Module("test module")
+        project.add_module(module)
+        module.ksloc = 100
+        
+        module.estimate_schedule()
+        self.assertAlmostEqual(465.3, module.nominal_schedule, places=1)
+
+    def test_estimate_schedule_nominal(self):
+        project: Project = Project("test project")
+
+        module: Module = Module("test module")
+        project.add_module(module)
+        module.ksloc = 100
+        module.effort_modifiers[EffortModifier.ACAP] = RatingLevel.HIGH
+        module.effort_modifiers[EffortModifier.PCAP] = RatingLevel.HIGH
+        
+        module.estimate_schedule()
+        self.assertAlmostEqual(348.1, module.nominal_schedule, places=1)
+    
+    def test_calculate_function_points(self):
+        module: Module = Module("<--test-->")
+        
+        counts = {
+            "EI": (5, 10, 2),
+            "EO":  (3, 8, 1),
+            "ILF": (6, 17, 8),
+            "EIF": (10, 10, 5),
+            "EQ":  (2, 5, 0),
+        }
+        
+        module.calculate_function_points(counts)
+        self.assertEqual(654, module.function_points)
+
+    def test_function_points_to_ksloc(self):
+        module: Module = Module("<--test-->")
+        module.function_points = 100
+        module.language = "C"
+        module.function_points_to_ksloc()
+        self.assertEqual(12_800, module.ksloc)
+
 
 
 

@@ -7,6 +7,7 @@ from constants import *
 class Module:
     def __init__(self, name: str):
         self.name: str = name
+        self.project: Project = None
         self.ksloc: int = 0
         self.effort_modifiers: dict[EffortModifier, RatingLevel] = {
             EffortModifier.RELY: RatingLevel.NOMINAL,
@@ -25,19 +26,24 @@ class Module:
             EffortModifier.LTEX: RatingLevel.NOMINAL,
             EffortModifier.TOOL: RatingLevel.NOMINAL,
             EffortModifier.SITE: RatingLevel.NOMINAL,
-            EffortModifier.SCED: RatingLevel.NOMINAL,
         }
         self.em_prod: float = 1.0
         self.function_points: int = 0
         self.language: Language = Language.C
         self.nominal_schedule: float = 0.0
 
-    def estimate_schedule(self, scale_factor_sum: int):
-        em_values = list(self.effort_modifiers.values())
-        # Need to create dictionary for EM and SF tables then lookup using RatingLevel
+    def estimate_schedule(self):
+        effort_modifier_prod: float = 1.0
+        for key, value in self.effort_modifiers.items():
+            effort_modifier_prod *= EFFORT_MODIFIER_COST_DRIVERS[key][value]
+        effort_modifier_prod *= SCHEDULE_COST_DRIVER[self.project.SCED]
+        
+        scale_factor_sum = 0
+        for key, value in self.project.scale_factors.items():
+            scale_factor_sum += SCALE_FACTOR_VALUES[key][value]
         
         E: float = B + 0.01 * scale_factor_sum
-        self.nominal_schedule = A * self.ksloc**E * effort_mod_prod
+        self.nominal_schedule = A * self.ksloc**E * effort_modifier_prod
 
     def calculate_function_points(self, function_counts: dict[str, tuple[int, int, int]]) -> None:
         fp: int = 0
@@ -62,10 +68,12 @@ class Project:
             ScaleFactor.PMAT: RatingLevel.NOMINAL,
             }
 
+        self.SCED = RatingLevel.NOMINAL
         self.modules: list[Module] = []
 
     def add_module(self, module: Module, position: int=-1) -> None:
         if module not in self.modules:
+            module.project = self
             if position < 0:
                 self.modules.append(module)
             else:

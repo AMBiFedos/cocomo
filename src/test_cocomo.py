@@ -49,17 +49,17 @@ class TestCocomoProject(unittest.TestCase):
 
 class TestCocomoModule(unittest.TestCase):
     
-    def test_estimate_schedule_nominal(self):
+    def test_estimate_effort_nominal(self):
         project: Project = Project("test project")
         
         module: Module = Module("test module")
         project.add_module(module)
         module.ksloc = 100
         
-        module.estimate_schedule()
-        self.assertAlmostEqual(465.3, module.nominal_schedule, places=1)
+        module.estimate_effort()
+        self.assertAlmostEqual(465.3, module.nominal_effort, places=1)
 
-    def test_estimate_schedule_nominal(self):
+    def test_estimate_effort(self):
         project: Project = Project("test project")
 
         module: Module = Module("test module")
@@ -68,8 +68,8 @@ class TestCocomoModule(unittest.TestCase):
         module.effort_modifiers[EffortModifier.ACAP] = RatingLevel.HIGH
         module.effort_modifiers[EffortModifier.PCAP] = RatingLevel.HIGH
         
-        module.estimate_schedule()
-        self.assertAlmostEqual(348.1, module.nominal_schedule, places=1)
+        module.estimate_effort()
+        self.assertAlmostEqual(348.1, module.nominal_effort, places=1)
     
     def test_calculate_function_points(self):
         module: Module = Module("<--test-->")

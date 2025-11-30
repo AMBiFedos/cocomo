@@ -30,9 +30,10 @@ class Module:
         self.em_prod: float = 1.0
         self.function_points: int = 0
         self.language: Language = Language.C
+        self.nominal_effort: float = 0.0
         self.nominal_schedule: float = 0.0
 
-    def estimate_schedule(self):
+    def estimate_effort(self):
         effort_modifier_prod: float = 1.0
         for key, value in self.effort_modifiers.items():
             effort_modifier_prod *= EFFORT_MODIFIER_COST_DRIVERS[key][value]
@@ -43,7 +44,7 @@ class Module:
             scale_factor_sum += SCALE_FACTOR_VALUES[key][value]
         
         E: float = B + 0.01 * scale_factor_sum
-        self.nominal_schedule = A * self.ksloc**E * effort_modifier_prod
+        self.nominal_effort = A * self.ksloc**E * effort_modifier_prod
 
     def calculate_function_points(self, function_counts: dict[str, tuple[int, int, int]]) -> None:
         fp: int = 0

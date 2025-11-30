@@ -8,7 +8,7 @@ class Module:
     def __init__(self, name: str):
         self.name: str = name
         self.project: Project = None
-        self.ksloc: int = 0
+        self.sloc: int = 0
         self.effort_modifiers: dict[EffortModifier, RatingLevel] = {
             EffortModifier.RELY: RatingLevel.NOMINAL,
             EffortModifier.DATA: RatingLevel.NOMINAL,
@@ -44,7 +44,7 @@ class Module:
             scale_factor_sum += SCALE_FACTOR_VALUES[key][value]
         
         E: float = B + 0.01 * scale_factor_sum
-        self.nominal_effort = A * self.ksloc**E * effort_modifier_prod
+        self.nominal_effort = A * (self.sloc / 1000.0)**E * effort_modifier_prod
 
     def calculate_function_points(self, function_counts: dict[str, tuple[int, int, int]]) -> None:
         fp: int = 0
@@ -55,7 +55,7 @@ class Module:
         self.function_points = fp
 
     def function_points_to_ksloc(self) -> None:
-        self.ksloc = self.function_points * FUNCTION_POINT_LANGUAGE_RATIOS[self.language]
+        self.sloc = self.function_points * FUNCTION_POINT_LANGUAGE_RATIOS[self.language]
 
 class Project:
     def __init__(self, name: str):
@@ -71,6 +71,7 @@ class Project:
 
         self.SCED = RatingLevel.NOMINAL
         self.modules: list[Module] = []
+        self.nominal_effort: float = 0.0
 
     def add_module(self, module: Module, position: int=-1) -> None:
         if module not in self.modules:
@@ -90,3 +91,4 @@ class Project:
         module: Module = self.modules.pop(old_position)
         self.modules.insert(new_position, module)
 
+        

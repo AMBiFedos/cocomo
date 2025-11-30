@@ -54,7 +54,7 @@ class TestCocomoModule(unittest.TestCase):
         
         module: Module = Module("test module")
         project.add_module(module)
-        module.ksloc = 100
+        module.sloc = 100000
         
         module.estimate_effort()
         self.assertAlmostEqual(465.3, module.nominal_effort, places=1)
@@ -64,7 +64,7 @@ class TestCocomoModule(unittest.TestCase):
 
         module: Module = Module("test module")
         project.add_module(module)
-        module.ksloc = 100
+        module.sloc = 100000
         module.effort_modifiers[EffortModifier.ACAP] = RatingLevel.HIGH
         module.effort_modifiers[EffortModifier.PCAP] = RatingLevel.HIGH
         
@@ -90,7 +90,7 @@ class TestCocomoModule(unittest.TestCase):
         module.function_points = 100
         module.language = "C"
         module.function_points_to_ksloc()
-        self.assertEqual(12_800, module.ksloc)
+        self.assertEqual(12_800, module.sloc)
 
 
 

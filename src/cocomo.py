@@ -91,4 +91,27 @@ class Project:
         module: Module = self.modules.pop(old_position)
         self.modules.insert(new_position, module)
 
+    def estimate_effort(self):
+        aggregate_sloc: int = 0
+        for module in self.modules:
+            aggregate_sloc += module.sloc
         
+        scale_factor_sum = 0
+        for key, value in self.scale_factors.items():
+            scale_factor_sum += SCALE_FACTOR_VALUES[key][value]
+        E: float = B + 0.01 * scale_factor_sum
+        
+        basic_effort: float = A * (aggregate_sloc / 1000)**E * SCHEDULE_COST_DRIVER[self.SCED]
+        
+        aggregate_basic_effort: float = 0.0
+        for module in self.modules:
+            basic_effort_i: float = basic_effort * (module.sloc / aggregate_sloc)
+            
+            effort_modifier_prod: float = 1.0
+            for key, value in module.effort_modifiers.items():
+                effort_modifier_prod *= EFFORT_MODIFIER_COST_DRIVERS[key][value]
+            effort_modifier_prod *= SCHEDULE_COST_DRIVER[self.SCED]
+                
+            aggregate_basic_effort += basic_effort_i * effort_modifier_prod
+
+        self.nominal_effort = aggregate_basic_effort

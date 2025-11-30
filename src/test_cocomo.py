@@ -46,6 +46,21 @@ class TestCocomoProject(unittest.TestCase):
         project.move_module(1, 0)
 
         self.assertListEqual([module2, module1], project.modules)
+        
+    def test_estimate_effort(self):
+        project: Project = Project("project")
+        module1: Module = Module("module1")
+        module1.sloc = 100000
+        
+        module2: Module = Module("module2")
+        module2.sloc = 100000
+        
+        project.add_module(module1)
+        project.add_module(module2)
+        
+        project.estimate_effort()
+        
+        self.assertAlmostEqual(997.2, project.nominal_effort, places=1)
 
 class TestCocomoModule(unittest.TestCase):
     

@@ -1,11 +1,11 @@
-from textual.app import App
+from textual.app import App, ComposeResult
 from textual import on
 from textual.screen import Screen, ModalScreen
 from textual.containers import Horizontal
 from textual.message import Message
 from textual.reactive import reactive
 from textual.widget import Widget
-from textual.widgets import Label, Input, Button, Header, Footer, Rule
+from textual.widgets import Label, Input, Button, Header, Footer, Rule, Tree
 
 from pathlib import Path
 
@@ -72,8 +72,6 @@ class ModuleListing(Widget):
         
         self.description = f"{self.module.name} | {self.module.sloc/1000} ksloc"
     
-    
-
     def compose(self):
         with Horizontal():
             yield Button("Edit", id="edit")
@@ -91,6 +89,10 @@ class ModuleListing(Widget):
     @on(Button.Pressed, "#delete")
     def delete_request(self):
         self.post_message(self.Delete(self))
+
+
+
+    
 
 class CocomoApp(App):
     CSS_PATH = "cocomo.css"
@@ -110,17 +112,25 @@ class CocomoApp(App):
     def __init__(self):
         super().__init__()
         self.project: Project = Project("Untitled")
-        self.module: Module = Module("My Module")
-        self.project.add_module(self.module)
-        self.module_item: ModuleListing = ModuleListing(self.module)
+        # self.module1: Module = Module("Module 1")
+        # self.module2: Module = Module("Module 2")
+        self.project.add_module(Module("Module 1"))
+        self.project.add_module(Module("Module 2"))
+        # self.module_item: ModuleListing = ModuleListing(self.module)
 
-    def compose(self):
+    def compose(self) -> ComposeResult:
         yield Header()
         yield Footer()
-        yield ProjectName()
-        yield Rule(line_style="double")
-        yield self.module_item
+        # yield ProjectName()
+        # yield Rule(line_style="double")
+        # yield self.module_item
         
+        tree: Tree[str] = Tree(self.project.name)
+        tree.root.expand()
+        for module in self.project.modules:
+            tree.root.add_leaf(module.name)
+        
+        yield tree
         
         
     @on(Input.Submitted, "#project_name")
@@ -133,6 +143,7 @@ class CocomoApp(App):
         for child in p.iterdir():
             self.projects.append(child)
             
+                
         
         
 

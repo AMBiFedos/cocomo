@@ -1,4 +1,20 @@
-Input {
+ProjectName{
+    height: 3;
+}
+
+ProjectName Label {
+    padding: 1;
+}
+
+ProjectName Input {
     height: 3;
     width: 25;
+}
+
+ModuleListing{
+    height: 3;
+}
+
+ModuleListing Label {
+    padding: 1;
 }

@@ -1,12 +1,12 @@
-ProjectName{
+ProjectHeader{
     height: 3;
 }
 
-ProjectName Label {
+ProjectHeader Label {
     padding: 1;
 }
 
-ProjectName Input {
+ProjectHeader Input {
     height: 3;
     width: 25;
 }
@@ -17,4 +17,17 @@ ModuleListing{
 
 ModuleListing Label {
     padding: 1;
+}
+
+#main_area {
+    width: 80%;
+}
+
+TabPane {
+    padding: 0 1;
+}
+
+#sidebar {
+    height: 100%;
+    border: solid blue;
 }

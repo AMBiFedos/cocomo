@@ -1,55 +1,43 @@
 from textual.app import App, ComposeResult
 from textual import on
 from textual.screen import Screen, ModalScreen
-from textual.containers import Horizontal
+from textual.containers import Horizontal, Vertical
 from textual.message import Message
 from textual.reactive import reactive
 from textual.widget import Widget
-from textual.widgets import Label, Input, Button, Header, Footer, Rule, Tree
+from textual.widgets import Label, Input, Button, Header, Footer, Tree, TabbedContent, TabPane, Static
 
 from pathlib import Path
 
 
 from cocomo import *
 
-
-# class ProjectManager(Widget):
-#     DEFAULT_CSS = """
-#     ProjectListing {
-#         height: 2;
-#     }
-#     """
+class ProjectHeader(Widget):
     
-#     TITLE = "COCOMO II.2000"
-#     SUB_TITLE = "Untitled"
-
-
-#     class Load(Message):
-#         def __init__(self, item):
-#             super().__init__()
-#             self.item = item
-            
-#     class Delete(Message):
-#         def __init__(self, item):
-#             super().__init__()
-#             self.item = item
+    project : Project
+    project_name: str = reactive("")
     
-#     def __init__(self, project_name: str="Untitled"):
-#         super().__init__()
-#         self.project_name = Input(project_name, id="project")
+    def __init__(self, project: Project):
+        super().__init__()
+        self.project: Project = project
+        self.project_name = project.name
         
-#     def compose(self):
-#         with Horizontal():
-#             yield Button("Load", id="load")
-#             yield Button("Rename", id="rename")
-#             yield Button("Delete", id="delete")
-#             yield self.project_name
-
-class ProjectName(Widget):
-    def compose(self):
+        self.project_name_input: Input = Input(self.project_name, id="project_name")
+        
+    
+    def compose(self) -> ComposeResult:
         with Horizontal():
-            yield Label("Project: ")
-            yield Input("Untitled", id="project_name")
+            yield self.project_name_input
+            yield Button("Schedule")
+            yield Button("Scale Factors")
+            yield Button("Report")
+            
+    def watch_project_name(self, project_name) -> None:
+        self.project.name = project_name
+    
+    @on(Input.Submitted, "#project_name")
+    def update_project_name(self)-> None:
+        self.project_name = self.query_one("#project_name").value
 
 class ModuleListing(Widget):
     
@@ -90,8 +78,6 @@ class ModuleListing(Widget):
     def delete_request(self):
         self.post_message(self.Delete(self))
 
-
-
     
 
 class CocomoApp(App):
@@ -102,6 +88,7 @@ class CocomoApp(App):
     BINDINGS = [
         ("n", "new_project", "New Project"),
         ("o", "open_project", "Open Project"),
+        # ("a", "add_module", "Add Module")
     ]
     
     projects_path = "../projects"
@@ -112,26 +99,21 @@ class CocomoApp(App):
     def __init__(self):
         super().__init__()
         self.project: Project = Project("Untitled")
-        # self.module1: Module = Module("Module 1")
-        # self.module2: Module = Module("Module 2")
         self.project.add_module(Module("Module 1"))
-        self.project.add_module(Module("Module 2"))
-        # self.module_item: ModuleListing = ModuleListing(self.module)
+
 
     def compose(self) -> ComposeResult:
         yield Header()
         yield Footer()
-        # yield ProjectName()
-        # yield Rule(line_style="double")
-        # yield self.module_item
         
-        tree: Tree[str] = Tree(self.project.name)
-        tree.root.expand()
-        for module in self.project.modules:
-            tree.root.add_leaf(module.name)
-        
-        yield tree
-        
+        with Horizontal():
+            with Vertical(id="main_area"):
+                yield ProjectHeader(self.project)
+                with TabbedContent(initial="module1"):
+                    with TabPane("Module 1", id="module1"):
+                        yield Static("Module 1")
+            
+            yield Static("\n\nPlaceholder", id="sidebar")
         
     @on(Input.Submitted, "#project_name")
     def update_project_name(self):

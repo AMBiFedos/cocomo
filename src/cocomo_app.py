@@ -62,7 +62,8 @@ class CocomoApp(App):
                 yield Label("Schedule Factor")
                 yield Static("")
                 yield Static("")
-                yield Input(self.project.name, id="project_name", disabled=True)
+                self.project_name_input: Input = Input(self.project.name, id="project_name", disabled=True)
+                yield self.project_name_input
                 yield Select([(i.value, i.name) for i in RatingLevel], id="sched_select", value=self.project.SCED.name, allow_blank=False)
                 yield Button("Scale Factors")
                 yield Button("Report")
@@ -80,18 +81,27 @@ class CocomoApp(App):
                                     yield Label(key.name)
                                     yield Select([(i.value, i.name) for i in RatingLevel], id="sched_select", value=value.name, allow_blank=False)
         
-        yield Static("\n\nPlaceholder", id="sidebar")
+        self.sidebar: Static = Static("\n\nPlaceholder", id="sidebar")
+        yield self.sidebar
         
     @on(Input.Submitted, "#project_name")
     def update_project_name(self):
         self.sub_title = self.query_one("#project_name").value
 
 
-    def load_projects(self):
-        p: Path = Path(self.projects_path)
-        for child in p.iterdir():
-            self.projects.append(child)
-            
+    def action_rename_project(self):
+        self.project_name_input.disabled=False
+        self.set_focus(self.project_name_input, True)
+        print("Rename Project")
+    
+    @on(Input.Submitted, "#project_name")
+    @on(Input.Blurred, "#project_name")
+    def rename_project(self):
+        self.project_name_input.disabled=True
+        self.project.name = self.project_name_input.value
+        print(f"Project renamed to {self.project.name}")
+        self.sidebar.update(self.project.name)
+        
             
 if __name__ == "__main__":
     CocomoApp().run()

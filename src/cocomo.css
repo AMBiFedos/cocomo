@@ -29,7 +29,6 @@ TabPane {
 }
 
 #sloc Label {
-    color: red;
     height: 3;
     content-align-vertical: middle;
 }

@@ -1,33 +1,40 @@
-ProjectHeader{
-    height: 3;
-}
-
-ProjectHeader Label {
-    padding: 1;
-}
-
-ProjectHeader Input {
-    height: 3;
-    width: 25;
-}
-
-ModuleListing{
-    height: 3;
-}
-
-ModuleListing Label {
-    padding: 1;
-}
-
-#main_area {
-    width: 80%;
-}
-
 TabPane {
     padding: 0 1;
 }
 
 #sidebar {
+    dock: right;
     height: 100%;
+    width: 30%;
     border: solid blue;
+}
+
+#project_header {
+    grid-size: 4 2;
+    grid-rows: auto;
+    height: 5;
+}
+
+#project_header Button {
+    align: center top;
+}
+
+.effort_modifiers {
+    grid-size: 4 4;
+    grid-rows: auto;
+}
+
+#sloc {
+    height: 5;
+}
+
+#sloc Label {
+    color: red;
+    height: 3;
+    content-align-vertical: middle;
+}
+
+#sloc Input {
+    width: 30;
+    height: 3;
 }

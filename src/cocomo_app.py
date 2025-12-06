@@ -1,84 +1,29 @@
 from textual.app import App, ComposeResult
 from textual import on
 from textual.screen import Screen, ModalScreen
-from textual.containers import Horizontal, Vertical
+from textual.containers import Horizontal, Vertical, Grid
 from textual.message import Message
 from textual.reactive import reactive
 from textual.widget import Widget
-from textual.widgets import Label, Input, Button, Header, Footer, Tree, TabbedContent, TabPane, Static
+from textual.widgets import Label, Input, Button, Header, Footer, Select, TabbedContent, TabPane, Static
 
 from pathlib import Path
 
-
-from cocomo import *
-
-class ProjectHeader(Widget):
-    
-    project : Project
-    project_name: str = reactive("")
-    
-    def __init__(self, project: Project):
-        super().__init__()
-        self.project: Project = project
-        self.project_name = project.name
-        
-        self.project_name_input: Input = Input(self.project_name, id="project_name")
-        
-    
-    def compose(self) -> ComposeResult:
-        with Horizontal():
-            yield self.project_name_input
-            yield Button("Schedule")
-            yield Button("Scale Factors")
-            yield Button("Report")
-            
-    def watch_project_name(self, project_name) -> None:
-        self.project.name = project_name
-    
-    @on(Input.Submitted, "#project_name")
-    def update_project_name(self)-> None:
-        self.project_name = self.query_one("#project_name").value
-
-class ModuleListing(Widget):
-    
-    description = reactive("")
-    
-    class Edit(Message):
-        def __init__(self, item):
-            super().__init__()
-            self.item = item
-    
-    class Delete(Message):
-        def __init__(self, item):
-            super().__init__()
-            self.item = item
-    
-    def __init__(self, module: Module):
-        super().__init__()
-        self.module: Module = module
-        self.description_label: Label = Label(id="description")
-        
-        self.description = f"{self.module.name} | {self.module.sloc/1000} ksloc"
-    
-    def compose(self):
-        with Horizontal():
-            yield Button("Edit", id="edit")
-            yield Button("Delete", id="delete")
-            yield self.description_label
-    
-    def watch_description(self, description):
-        self.description_label.update(description)
-    
-    
-    @on(Button.Pressed, "#edit")
-    def edit_request(self):
-        self.post_message(self.Edit(self))
-        
-    @on(Button.Pressed, "#delete")
-    def delete_request(self):
-        self.post_message(self.Delete(self))
+from cocomo import Project, Module
+from constants import RatingLevel, EffortModifier
 
     
+# class ModulePane(Widget):
+    
+    
+    
+#     def __init__(self, module: Module):
+#         super().__init__()
+#         self.module: Module = module
+        
+    
+#     def compose(self):
+#         pass    
 
 class CocomoApp(App):
     CSS_PATH = "cocomo.css"
@@ -86,14 +31,15 @@ class CocomoApp(App):
     SUB_TITLE = "Untitled"
     
     BINDINGS = [
-        ("n", "new_project", "New Project"),
-        ("o", "open_project", "Open Project"),
-        # ("a", "add_module", "Add Module")
+        ("n", "new_project"),
+        ("o", "open_project"),
+        ("r", "rename_project", "Rename Project"),
+        # ("a", "add_module", "Add Module"),
     ]
     
     projects_path = "../projects"
     
-    module_item: ModuleListing = None
+    # module_item: ModulePane = None
 
 
     def __init__(self):
@@ -101,19 +47,40 @@ class CocomoApp(App):
         self.project: Project = Project("Untitled")
         self.project.add_module(Module("Module 1"))
 
+    def on_mount(self):
+        self.theme = "catppuccin-latte"
+        
 
     def compose(self) -> ComposeResult:
         yield Header()
         yield Footer()
         
-        with Horizontal():
-            with Vertical(id="main_area"):
-                yield ProjectHeader(self.project)
-                with TabbedContent(initial="module1"):
-                    with TabPane("Module 1", id="module1"):
-                        yield Static("Module 1")
+        with Vertical(id="main_area"):
+            # yield ProjectHeader(self.project)
+            with Grid(id="project_header"):
+                yield Label("Project Name")
+                yield Label("Schedule Factor")
+                yield Static("")
+                yield Static("")
+                yield Input(self.project.name, id="project_name", disabled=True)
+                yield Select([(i.value, i.name) for i in RatingLevel], id="sched_select", value=self.project.SCED.name, allow_blank=False)
+                yield Button("Scale Factors")
+                yield Button("Report")
             
-            yield Static("\n\nPlaceholder", id="sidebar")
+            
+            with TabbedContent():
+                for module in self.project.modules:
+                    with TabPane(module.name, id=module.name.lower().replace(" ", "")):
+                        with Horizontal(id="sloc"):
+                            yield Label("Lines of Code:")
+                            yield Input(str(module.sloc))
+                        with Grid(classes="effort_modifiers"):
+                            for key, value in module.effort_modifiers.items():
+                                with Vertical():
+                                    yield Label(key.name)
+                                    yield Select([(i.value, i.name) for i in RatingLevel], id="sched_select", value=value.name, allow_blank=False)
+        
+        yield Static("\n\nPlaceholder", id="sidebar")
         
     @on(Input.Submitted, "#project_name")
     def update_project_name(self):
@@ -125,10 +92,6 @@ class CocomoApp(App):
         for child in p.iterdir():
             self.projects.append(child)
             
-                
-        
-        
-
-
+            
 if __name__ == "__main__":
     CocomoApp().run()

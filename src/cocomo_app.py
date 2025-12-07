@@ -32,9 +32,11 @@ class ModulePane(TabPane):
                 with Vertical():
                     yield Label(key.name)
                     yield Select([(i.value, i) for i in RatingLevel], value=value, 
-                                    allow_blank=False, id=key.name + "_select")
+                                    allow_blank=False, id=key.name)
 
-
+    @on(Select.Changed)
+    def update_effort_modifier(self, event: Select.Changed):
+        self.module.effort_modifiers[EffortModifier[event._sender.id]] = event._sender.value
 
 class CocomoApp(App):
     CSS_PATH = "cocomo.tcss"

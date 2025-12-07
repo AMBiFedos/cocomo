@@ -12,18 +12,28 @@ from pathlib import Path
 from cocomo import Project, Module
 from constants import RatingLevel, EffortModifier
 
+class ModulePane(TabPane):
     
-# class ModulePane(Widget):
-    
-    
-    
-#     def __init__(self, module: Module):
-#         super().__init__()
-#         self.module: Module = module
+    def __init__(self, module, *children, name = None, disabled = False):
+        id = module.name.lower().replace(" ", "") + "_tab"
+        super().__init__(module.name, *children, name=name, id=id, classes="module_tabs", disabled=disabled)
+        self.module = module
         
-    
-#     def compose(self):
-#         pass    
+
+    def compose(self):
+        with Horizontal(id="sloc"):
+            yield Label("Lines of Code:")
+            yield Input(str(self.module.sloc))
+            
+        with Grid(classes="effort_modifiers"):
+            for key, value in self.module.effort_modifiers.items():
+                with Vertical():
+                    yield Label(key.name)
+                    yield Select([(i.value, i) for i in RatingLevel], value=value, 
+                                    allow_blank=False, id=key.name + "_select")
+
+
+
 
 class CocomoApp(App):
     CSS_PATH = "cocomo.css"
@@ -34,7 +44,7 @@ class CocomoApp(App):
         ("n", "new_project"),
         ("o", "open_project"),
         ("r", "rename_project", "Rename Project"),
-        # ("a", "add_module", "Add Module"),
+        ("a", "add_module", "Add Module"),
     ]
     
     projects_path = "../projects"
@@ -71,15 +81,7 @@ class CocomoApp(App):
             
             with TabbedContent():
                 for module in self.project.modules:
-                    with TabPane(module.name, id=module.name.lower().replace(" ", "")):
-                        with Horizontal(id="sloc"):
-                            yield Label("Lines of Code:")
-                            yield Input(str(module.sloc))
-                        with Grid(classes="effort_modifiers"):
-                            for key, value in module.effort_modifiers.items():
-                                with Vertical():
-                                    yield Label(key.name)
-                                    yield Select([(i.value, i) for i in RatingLevel], value=value, allow_blank=False)
+                    yield ModulePane(module)
         
         self.sidebar: Static = Static("\n\nPlaceholder", id="sidebar")
         yield self.sidebar
@@ -90,6 +92,7 @@ class CocomoApp(App):
         self.set_focus(self.project_name_input, True)
         print("Rename Project")
     
+
     @on(Input.Submitted, "#project_name")
     @on(Input.Blurred, "#project_name")
     def rename_project(self):
@@ -101,11 +104,8 @@ class CocomoApp(App):
         
     @on(Select.Changed, "#sched_select")
     def select_schedule_factor(self):
-        
-        # my_sced: RatingLevel = self.query_one("#sched_select").value
         self.project.SCED = RatingLevel(self.query_one("#sched_select").value)
-        self.sidebar.update(f"{self.project.SCED.name} -- {self.project.SCED.value}")
-        
+
 
 
 if __name__ == "__main__":

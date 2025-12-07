@@ -37,7 +37,7 @@ class ModulePane(TabPane):
 
 
 class CocomoApp(App):
-    CSS_PATH = "cocomo.css"
+    CSS_PATH = "cocomo.tcss"
     TITLE = "COCOMO II.2000"    
     SUB_TITLE = "Untitled"
     
@@ -93,12 +93,15 @@ class CocomoApp(App):
         self.project_name_input.disabled=False
         self.set_focus(self.project_name_input, True)
     
+    
     def action_add_module(self):
         self.new_module_count += 1
         module: Module = Module(f"Module {self.new_module_count}")
         self.project.add_module(module)
         self.query_one(TabbedContent).add_pane(ModulePane(module))
 
+    
+    
     @on(Input.Submitted, "#project_name")
     @on(Input.Blurred, "#project_name")
     def rename_project(self):

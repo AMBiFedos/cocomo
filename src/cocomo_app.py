@@ -64,7 +64,7 @@ class CocomoApp(App):
                 yield Static("")
                 self.project_name_input: Input = Input(self.project.name, id="project_name", disabled=True)
                 yield self.project_name_input
-                yield Select([(i.value, i.name) for i in RatingLevel], id="sched_select", value=self.project.SCED.name, allow_blank=False)
+                yield Select([(i.value, i) for i in RatingLevel], id="sched_select", value=self.project.SCED, allow_blank=False)
                 yield Button("Scale Factors")
                 yield Button("Report")
             
@@ -79,15 +79,11 @@ class CocomoApp(App):
                             for key, value in module.effort_modifiers.items():
                                 with Vertical():
                                     yield Label(key.name)
-                                    yield Select([(i.value, i.name) for i in RatingLevel], id="sched_select", value=value.name, allow_blank=False)
+                                    yield Select([(i.value, i) for i in RatingLevel], value=value, allow_blank=False)
         
         self.sidebar: Static = Static("\n\nPlaceholder", id="sidebar")
         yield self.sidebar
         
-    @on(Input.Submitted, "#project_name")
-    def update_project_name(self):
-        self.sub_title = self.query_one("#project_name").value
-
 
     def action_rename_project(self):
         self.project_name_input.disabled=False
@@ -101,7 +97,16 @@ class CocomoApp(App):
         self.project.name = self.project_name_input.value
         print(f"Project renamed to {self.project.name}")
         self.sidebar.update(self.project.name)
+        self.sub_title = self.query_one("#project_name").value
         
-            
+    @on(Select.Changed, "#sched_select")
+    def select_schedule_factor(self):
+        
+        # my_sced: RatingLevel = self.query_one("#sched_select").value
+        self.project.SCED = RatingLevel(self.query_one("#sched_select").value)
+        self.sidebar.update(f"{self.project.SCED.name} -- {self.project.SCED.value}")
+        
+
+
 if __name__ == "__main__":
     CocomoApp().run()

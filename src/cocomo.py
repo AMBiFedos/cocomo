@@ -54,7 +54,7 @@ class Module:
 
         self.function_points = fp
 
-    def function_points_to_ksloc(self) -> None:
+    def function_points_to_sloc(self) -> None:
         self.sloc = self.function_points * FUNCTION_POINT_LANGUAGE_RATIOS[self.language]
 
 class Project:

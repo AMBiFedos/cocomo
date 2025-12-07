@@ -104,7 +104,7 @@ class TestCocomoModule(unittest.TestCase):
         module: Module = Module("<--test-->")
         module.function_points = 100
         module.language = "C"
-        module.function_points_to_ksloc()
+        module.function_points_to_sloc()
         self.assertEqual(12_800, module.sloc)
 
 

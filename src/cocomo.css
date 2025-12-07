@@ -24,16 +24,16 @@ TabPane {
     grid-rows: auto;
 }
 
-#sloc {
-    height: 5;
+#sloc_group {
+    height: 3;
 }
 
-#sloc Label {
+#sloc_group Label {
     height: 3;
     content-align-vertical: middle;
 }
 
-#sloc Input {
+#sloc_input {
     width: 30;
     height: 3;
 }

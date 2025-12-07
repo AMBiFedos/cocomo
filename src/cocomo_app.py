@@ -5,7 +5,7 @@ from textual.containers import Horizontal, Vertical, Grid
 from textual.message import Message
 from textual.reactive import reactive
 from textual.widget import Widget
-from textual.widgets import Label, Input, Button, Header, Footer, Select, TabbedContent, TabPane, Static
+from textual.widgets import Label, Input, Button, Header, Footer, Select, TabbedContent, TabPane, Static, Rule
 
 from pathlib import Path
 
@@ -21,17 +21,18 @@ class ModulePane(TabPane):
         
 
     def compose(self):
-        with Horizontal(id="sloc"):
+        with Horizontal(id="sloc_group"):
             yield Label("Lines of Code:")
-            yield Input(str(self.module.sloc))
-            
+            yield Input(str(self.module.sloc), id="sloc_input")
+        
+        yield Rule()
+                    
         with Grid(classes="effort_modifiers"):
             for key, value in self.module.effort_modifiers.items():
                 with Vertical():
                     yield Label(key.name)
                     yield Select([(i.value, i) for i in RatingLevel], value=value, 
                                     allow_blank=False, id=key.name + "_select")
-
 
 
 
@@ -56,6 +57,7 @@ class CocomoApp(App):
         super().__init__()
         self.project: Project = Project("Untitled")
         self.project.add_module(Module("Module 1"))
+        self.new_module_count: int = 1
 
     def on_mount(self):
         self.theme = "catppuccin-latte"
@@ -90,15 +92,18 @@ class CocomoApp(App):
     def action_rename_project(self):
         self.project_name_input.disabled=False
         self.set_focus(self.project_name_input, True)
-        print("Rename Project")
     
+    def action_add_module(self):
+        self.new_module_count += 1
+        module: Module = Module(f"Module {self.new_module_count}")
+        self.project.add_module(module)
+        self.query_one(TabbedContent).add_pane(ModulePane(module))
 
     @on(Input.Submitted, "#project_name")
     @on(Input.Blurred, "#project_name")
     def rename_project(self):
         self.project_name_input.disabled=True
         self.project.name = self.project_name_input.value
-        print(f"Project renamed to {self.project.name}")
         self.sidebar.update(self.project.name)
         self.sub_title = self.query_one("#project_name").value
         

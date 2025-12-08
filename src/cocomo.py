@@ -37,7 +37,7 @@ class Module:
         effort_modifier_prod: float = 1.0
         for key, value in self.effort_modifiers.items():
             effort_modifier_prod *= EFFORT_MODIFIER_COST_DRIVERS[key][value]
-        effort_modifier_prod *= SCHEDULE_COST_DRIVER[self.project.SCED]
+        effort_modifier_prod *= SCHEDULE_COST_DRIVER[self.project.schedule_factor]
         
         scale_factor_sum = 0
         for key, value in self.project.scale_factors.items():
@@ -69,7 +69,7 @@ class Project:
             ScaleFactor.PMAT: RatingLevel.NOMINAL,
             }
 
-        self.SCED = RatingLevel.NOMINAL
+        self.schedule_factor = RatingLevel.NOMINAL
         self.modules: list[Module] = []
         self.nominal_effort: float = 0.0
 
@@ -101,7 +101,7 @@ class Project:
             scale_factor_sum += SCALE_FACTOR_VALUES[key][value]
         E: float = B + 0.01 * scale_factor_sum
         
-        basic_effort: float = A * (aggregate_sloc / 1000)**E * SCHEDULE_COST_DRIVER[self.SCED]
+        basic_effort: float = A * (aggregate_sloc / 1000)**E * SCHEDULE_COST_DRIVER[self.schedule_factor]
         
         aggregate_basic_effort: float = 0.0
         for module in self.modules:
@@ -110,8 +110,31 @@ class Project:
             effort_modifier_prod: float = 1.0
             for key, value in module.effort_modifiers.items():
                 effort_modifier_prod *= EFFORT_MODIFIER_COST_DRIVERS[key][value]
-            effort_modifier_prod *= SCHEDULE_COST_DRIVER[self.SCED]
+            effort_modifier_prod *= SCHEDULE_COST_DRIVER[self.schedule_factor]
                 
             aggregate_basic_effort += basic_effort_i * effort_modifier_prod
 
         self.nominal_effort = aggregate_basic_effort
+
+class ModuleEncoder(json.JSONEncoder):
+    def default(self, obj: Module) -> dict[str, Union[str, int, dict]]:
+        if isinstance(obj, Module):
+            return {
+                "name": obj.name,
+                "sloc": obj.sloc,
+                "effort_modifiers": {key.name: value.name for key, value in obj.effort_modifiers.items()},
+                "function_points": obj.function_points,
+                "language": obj.language.name,
+            }
+        return super().default(obj)
+
+class ProjectEncoder(json.JSONEncoder):
+    def default(self, obj: Project) -> dict[str, Union[str, dict, list]]:
+        if isinstance(obj, Project):
+            return {
+                "name": obj.name,
+                "scale_factors": {key.name: value.name for key, value in obj.scale_factors.items()},
+                "sced": obj.schedule_factor.name,
+                "modules": [ModuleEncoder.default(module) for module in obj.modules],
+            }
+        return super().default(obj)

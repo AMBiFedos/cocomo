@@ -78,7 +78,7 @@ class CocomoApp(App):
                 yield Static("")
                 self.project_name_input: Input = Input(self.project.name, id="project_name", disabled=True)
                 yield self.project_name_input
-                yield Select([(i.value, i) for i in RatingLevel], id="sched_select", value=self.project.SCED, allow_blank=False)
+                yield Select([(i.value, i) for i in RatingLevel], id="sched_select", value=self.project.schedule_factor, allow_blank=False)
                 yield Button("Scale Factors")
                 yield Button("Report")
             
@@ -114,7 +114,7 @@ class CocomoApp(App):
         
     @on(Select.Changed, "#sched_select")
     def select_schedule_factor(self):
-        self.project.SCED = RatingLevel(self.query_one("#sched_select").value)
+        self.project.schedule_factor = RatingLevel(self.query_one("#sched_select").value)
 
 
 

@@ -8,9 +8,11 @@ wheels/
 
 # Virtual environments
 .venv
+uv.lock
 
 # IDE Specific
 .vscode
+.idea
 
 references/
 

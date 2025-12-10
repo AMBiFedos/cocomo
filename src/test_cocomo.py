@@ -1,5 +1,6 @@
 import unittest
 from cocomo import *
+import json
 
 class TestCocomoProject(unittest.TestCase):
     
@@ -62,6 +63,19 @@ class TestCocomoProject(unittest.TestCase):
         
         self.assertAlmostEqual(997.2, project.nominal_effort, places=1)
 
+    def test_project_encoder(self):
+        project: Project = Project("Project 1")
+        project.add_module(Module("Module 1"))
+        project.add_module(Module("Module 2"))
+        encoded = ProjectEncoder().default(project)
+        with open('test_project.json', 'w') as file:
+            json.dump(json.dumps(encoded,
+                                 sort_keys=False,
+                                 indent=4,
+                                 ),
+                      file)
+
+
 class TestCocomoModule(unittest.TestCase):
     
     def test_estimate_effort_nominal(self):
@@ -107,6 +121,15 @@ class TestCocomoModule(unittest.TestCase):
         module.function_points_to_sloc()
         self.assertEqual(12_800, module.sloc)
 
+    def test_module_encoder(self):
+        module: Module = Module("Module 1")
+        encoded = ModuleEncoder().default(module)
+        with open('test_module.json', 'w') as file:
+            json.dump(json.dumps(encoded,
+                                 sort_keys=False,
+                                 indent=4,
+                                 ),
+                      file)
 
 
 

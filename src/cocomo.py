@@ -135,6 +135,6 @@ class ProjectEncoder(json.JSONEncoder):
                 "name": obj.name,
                 "scale_factors": {key.name: value.name for key, value in obj.scale_factors.items()},
                 "sced": obj.schedule_factor.name,
-                "modules": [ModuleEncoder.default(module) for module in obj.modules],
+                "modules": [ModuleEncoder().default(module) for module in obj.modules],
             }
         return super().default(obj)

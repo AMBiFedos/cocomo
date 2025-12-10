@@ -8,8 +8,9 @@ from textual.widget import Widget
 from textual.widgets import Label, Input, Button, Header, Footer, Select, TabbedContent, TabPane, Static, Rule
 
 from pathlib import Path
+import json
 
-from cocomo import Project, Module
+from cocomo import Project, Module, ProjectEncoder
 from constants import RatingLevel, EffortModifier
 
 class ModulePane(TabPane):
@@ -46,11 +47,12 @@ class CocomoApp(App):
     BINDINGS = [
         ("n", "new_project"),
         ("o", "open_project"),
+        ("s", "save_project", "Save Project"),
         ("r", "rename_project", "Rename Project"),
         ("a", "add_module", "Add Module"),
     ]
     
-    projects_path = "../projects"
+    projects_directory = "projects"
     
     # module_item: ModulePane = None
 
@@ -95,7 +97,23 @@ class CocomoApp(App):
         self.project_name_input.disabled=False
         self.set_focus(self.project_name_input, True)
     
-    
+    def action_save_project(self):
+        projects_path = Path(Path.cwd(),self.projects_directory)
+        projects_path.mkdir(parents=True, exist_ok=True)
+
+        project_file = Path(projects_path, "project.json")
+        
+        project_json = json.dumps(self.project.encode(),
+                                 sort_keys=False,
+                                 indent=4,
+                                 )
+        project_file.write_text(
+            project_json
+        )
+
+
+
+
     def action_add_module(self):
         self.new_module_count += 1
         module: Module = Module(f"Module {self.new_module_count}")

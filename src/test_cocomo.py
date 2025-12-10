@@ -67,13 +67,13 @@ class TestCocomoProject(unittest.TestCase):
         project: Project = Project("Project 1")
         project.add_module(Module("Module 1"))
         project.add_module(Module("Module 2"))
-        encoded = ProjectEncoder().default(project)
+        encoded = project.encode()
         with open('test_project.json', 'w') as file:
-            json.dump(json.dumps(encoded,
+            file.write(json.dumps(encoded,
                                  sort_keys=False,
                                  indent=4,
                                  ),
-                      file)
+                      )
 
 
 class TestCocomoModule(unittest.TestCase):
@@ -123,13 +123,13 @@ class TestCocomoModule(unittest.TestCase):
 
     def test_module_encoder(self):
         module: Module = Module("Module 1")
-        encoded = ModuleEncoder().default(module)
+        encoded = module.encode
         with open('test_module.json', 'w') as file:
-            json.dump(json.dumps(encoded,
+            file.write(json.dumps(encoded,
                                  sort_keys=False,
                                  indent=4,
                                  ),
-                      file)
+                      )
 
 
 

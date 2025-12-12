@@ -92,10 +92,23 @@ class CocomoApp(App):
         self.sidebar: Static = Static("\n\nPlaceholder", id="sidebar")
         yield self.sidebar
         
-
-    def action_rename_project(self):
-        self.project_name_input.disabled=False
-        self.set_focus(self.project_name_input, True)
+    def action_open_project(self):
+        projects_path = Path(Path.cwd(),self.projects_directory)
+        project_file = Path(projects_path, "project.json")
+        
+        if project_file.exists():
+            project_json = project_file.read_text()
+            project_dict = json.loads(project_json)
+            self.project = Project.decode(project_dict)
+            self.sidebar.update(self.project.name)
+            self.sub_title = self.project.name
+            
+            # tabbed_content = self.query_one(TabbedContent)
+            # tabbed_content.clear()
+            # for module in self.project.modules:
+            #     tabbed_content.add_pane(ModulePane(module))
+    
+    
     
     def action_save_project(self):
         projects_path = Path(Path.cwd(),self.projects_directory)
@@ -103,16 +116,19 @@ class CocomoApp(App):
 
         project_file = Path(projects_path, "project.json")
         
-        project_json = json.dumps(self.project.encode(),
-                                 sort_keys=False,
-                                 indent=4,
-                                 )
+        project_json = json.dumps(
+            self.project.encode(),
+            sort_keys=False,
+            indent=4,
+        )
+        
         project_file.write_text(
             project_json
         )
 
-
-
+    def action_rename_project(self):
+        self.project_name_input.disabled=False
+        self.set_focus(self.project_name_input, True)
 
     def action_add_module(self):
         self.new_module_count += 1

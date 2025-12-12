@@ -1,0 +1,24 @@
+{
+    "name": "Module 1",
+    "sloc": 0,
+    "effort_modifiers": {
+        "RELY": "NOMINAL",
+        "DATA": "NOMINAL",
+        "CPLX": "NOMINAL",
+        "RUSE": "NOMINAL",
+        "DOCU": "NOMINAL",
+        "TIME": "NOMINAL",
+        "STOR": "NOMINAL",
+        "PVOL": "NOMINAL",
+        "ACAP": "NOMINAL",
+        "PCAP": "NOMINAL",
+        "PCON": "NOMINAL",
+        "APEX": "NOMINAL",
+        "PLEX": "NOMINAL",
+        "LTEX": "NOMINAL",
+        "TOOL": "NOMINAL",
+        "SITE": "NOMINAL"
+    },
+    "function_points": 0,
+    "language": "C"
+}

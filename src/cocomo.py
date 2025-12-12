@@ -57,6 +57,9 @@ class Module:
     def function_points_to_sloc(self) -> None:
         self.sloc = self.function_points * FUNCTION_POINT_LANGUAGE_RATIOS[self.language]
 
+    def encode(self):
+        return ModuleEncoder().default(self)
+
 class Project:
     def __init__(self, name: str):
         self.name = name
@@ -116,6 +119,9 @@ class Project:
 
         self.nominal_effort = aggregate_basic_effort
 
+    def encode(self):
+        return ProjectEncoder().default(self)
+
 class ModuleEncoder(json.JSONEncoder):
     def default(self, obj: Module) -> dict[str, Union[str, int, dict]]:
         if isinstance(obj, Module):
@@ -134,7 +140,7 @@ class ProjectEncoder(json.JSONEncoder):
             return {
                 "name": obj.name,
                 "scale_factors": {key.name: value.name for key, value in obj.scale_factors.items()},
-                "sced": obj.schedule_factor.name,
-                "modules": [ModuleEncoder().default(module) for module in obj.modules],
+                "schedule factor": obj.schedule_factor.name,
+                "modules": [module.encode() for module in obj.modules],
             }
         return super().default(obj)

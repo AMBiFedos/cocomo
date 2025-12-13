@@ -1,7 +1,7 @@
 from textual.app import App, ComposeResult
 from textual import on
 from textual.screen import Screen, ModalScreen
-from textual.containers import Horizontal, Vertical, Grid
+from textual.containers import Horizontal, Vertical, Grid, Container, Center
 from textual.message import Message
 from textual.reactive import reactive
 from textual.widget import Widget
@@ -20,16 +20,20 @@ class SaveScreen(ModalScreen[Path]):
         self.file_name: str = file_name
     
     def compose(self):
-        
-        with Horizontal():
+        with Container():
             yield Label("Path:")
-            yield Input(str(Path(Path.home(), "cocomo-projects")), id="save_path")
-        with Horizontal():
+            initial_path: Path = Path(Path.home(), "cocomo-projects")
+            yield Input(str(initial_path), id="save_path")
+            path_msg = "" if initial_path.exists() else "The path does not exist and will be created."
+            yield Label(path_msg, id="path_msg")
             yield Label("File Name:")
-            yield Input(self.file_name + ".json", id="save_file")
-        with Horizontal():
-            yield Button("OK", id="ok_button")
-            yield Button("Cancel", id="cancel_button")
+            file_name: str = self.file_name + ".json"
+            yield Input(file_name, id="save_file")
+            file_msg = "" if not Path(initial_path, file_name).exists() else "Warning: This file already exists and will be overwritten."
+            yield Label(file_msg, id="file_msg")
+            with Horizontal():
+                yield Button("OK", id="ok_button")
+                yield Button("Cancel", id="cancel_button")
 
     @on(Button.Pressed, "#ok_button")
     def save_file(self):
@@ -39,8 +43,24 @@ class SaveScreen(ModalScreen[Path]):
     @on(Button.Pressed, "#cancel_button")
     def cancel_save(self):
         self.dismiss(None)
+        
+    @on(Input.Changed, "#save_path")
+    def validate_path(self):
+        save_path: Path = Path(self.query_one("#save_path").value)
+        path_msg: Label = self.query_one("#path_msg")
+        if not save_path.exists():
+            path_msg.update("The path does not exist and will be created.")
+        else:
+            path_msg.update("")
 
-                            
+    @on(Input.Changed, "#save_file")
+    def validate_file_name(self):
+        save_path: Path = Path(self.query_one("#save_path").value, self.query_one("#save_file").value)
+        file_msg: Label = self.query_one("#file_msg")
+        if save_path.exists():
+            file_msg.update("Warning: This file already exists and will be overwritten.")
+        else:
+            file_msg.update("")
 
 
 class ModulePane(TabPane):
@@ -140,7 +160,8 @@ class CocomoApp(App):
     
     
     def action_save_project(self):
-        self.push_screen(SaveScreen(self.project.name), self.save_screen_callback)
+        project_name = self.project.name.replace(" ", "-")
+        self.push_screen(SaveScreen(project_name), self.save_screen_callback)
 
     def save_screen_callback(self, save_path: Path) -> None:
         if save_path is None:

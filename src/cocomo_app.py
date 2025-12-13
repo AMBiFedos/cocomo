@@ -13,6 +13,36 @@ import json
 from cocomo import Project, Module, ProjectEncoder
 from constants import RatingLevel, EffortModifier
 
+
+class SaveScreen(ModalScreen[Path]):
+    def __init__(self, file_name: str = "project", name = None, id = None, classes = None):
+        super().__init__(name, id, classes)
+        self.file_name: str = file_name
+    
+    def compose(self):
+        
+        with Horizontal():
+            yield Label("Path:")
+            yield Input(str(Path(Path.home(), "cocomo-projects")), id="save_path")
+        with Horizontal():
+            yield Label("File Name:")
+            yield Input(self.file_name + ".json", id="save_file")
+        with Horizontal():
+            yield Button("OK", id="ok_button")
+            yield Button("Cancel", id="cancel_button")
+
+    @on(Button.Pressed, "#ok_button")
+    def save_file(self):
+        save_path: Path = Path(self.query_one("#save_path").value, self.query_one("#save_file").value)
+        self.dismiss(save_path)
+    
+    @on(Button.Pressed, "#cancel_button")
+    def cancel_save(self):
+        self.dismiss(None)
+
+                            
+
+
 class ModulePane(TabPane):
     
     def __init__(self, module, *children, name = None, disabled = False):
@@ -109,20 +139,22 @@ class CocomoApp(App):
             #     tabbed_content.add_pane(ModulePane(module))
     
     
-    
     def action_save_project(self):
-        projects_path = Path(Path.cwd(),self.projects_directory)
-        projects_path.mkdir(parents=True, exist_ok=True)
+        self.push_screen(SaveScreen(self.project.name), self.save_screen_callback)
 
-        project_file = Path(projects_path, "project.json")
-        
+    def save_screen_callback(self, save_path: Path) -> None:
+        if save_path is None:
+            return
+
+        save_path.parent.mkdir(parents=True, exist_ok=True)
+
         project_json = json.dumps(
             self.project.encode(),
             sort_keys=False,
             indent=4,
         )
         
-        project_file.write_text(
+        save_path.write_text(
             project_json
         )
 

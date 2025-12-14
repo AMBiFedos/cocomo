@@ -60,6 +60,14 @@ class Module:
     def encode(self):
         return ModuleEncoder().default(self)
 
+    def module_from_dict(data: dict) -> 'Module':
+        module = Module(data["name"])
+        module.sloc = data["sloc"]
+        module.effort_modifiers = {EffortModifier[key]: RatingLevel[value] for key, value in data["effort_modifiers"].items()}
+        module.function_points = data["function_points"]
+        module.language = Language[data["language"]]
+        return module
+
 class Project:
     def __init__(self, name: str):
         self.name = name
@@ -121,6 +129,15 @@ class Project:
 
     def encode(self):
         return ProjectEncoder().default(self)
+    
+    def project_from_dict(data: dict) -> 'Project':
+        project = Project(data["name"])
+        project.scale_factors = {ScaleFactor[key]: RatingLevel[value] for key, value in data["scale_factors"].items()}
+        project.schedule_factor = RatingLevel[data["schedule factor"]]
+        for module_data in data["modules"]:
+            module = Module.module_from_dict(module_data)
+            project.add_module(module)
+        return project
 
 class ModuleEncoder(json.JSONEncoder):
     def default(self, obj: Module) -> dict[str, Union[str, int, dict]]:

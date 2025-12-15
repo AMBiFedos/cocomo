@@ -196,6 +196,12 @@ class CocomoApp(App):
         self.sidebar: Static = Static("\n\nPlaceholder", id="sidebar")
         yield self.sidebar
         
+    async def action_new_project(self):
+        self.project = Project("Untitled")
+        self.project.add_module(Module("Module 1"))
+        self.new_module_count = 1
+        await self.refresh_values()
+
     def action_open_project(self):
         self.push_screen(LoadScreen(), self.load_screen_callback)
     
@@ -207,7 +213,8 @@ class CocomoApp(App):
         project_json = load_path.read_text()
         project_data = json.loads(project_json)
         self.project = Project.project_from_dict(project_data)
-
+        self.new_module_count = 1
+        
         await self.refresh_values()
 
     async def refresh_values(self) -> None:
@@ -224,7 +231,6 @@ class CocomoApp(App):
 
         self.sub_title = self.project.name
 
-        
     def action_save_project(self):
         project_name = self.project.name.replace(" ", "-")
         self.push_screen(SaveScreen(project_name), self.save_screen_callback)

@@ -70,3 +70,36 @@ SaveScreen > Container {
     width: 50%;
     height: 50%;
 }
+
+LoadScreen {
+    width: 50;
+    align: center middle;
+
+}
+
+LoadScreen > Horizontal {
+    height: 5;
+    width: 75;
+}
+
+LoadScreen > Container > Input {
+    width: 100%;
+    margin: 1
+}
+
+LoadScreen > Container > Label {
+    padding-left: 1;
+    padding-right: 1;
+}
+
+LoadScreen > Container >  Horizontal > Button {
+    margin: 1;
+    padding-right: 1;
+}
+
+LoadScreen > Container {
+    background: $boost;
+    border: thick $background;   
+    width: 50%;
+    height: 50%;
+}

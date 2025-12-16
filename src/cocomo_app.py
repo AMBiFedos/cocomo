@@ -122,12 +122,33 @@ class SaveScreen(ModalScreen[Path]):
         else:
             file_msg.update("")
 
+class ModuleRenameScreen(ModalScreen[str]):
+    def __init__(self, module_name: str, name = None, id = None, classes = None):
+        super().__init__(name, id, classes)
+        self.module_name: str = module_name
+
+    def compose(self):
+        yield Label("Module Name:")
+        yield Input(self.module_name, id="module_name_input")
+        with Horizontal():
+            yield Button("OK", id="ok_button")
+            yield Button("Cancel", id="cancel_button")
+
+    @on(Button.Pressed, "#ok_button")
+    def rename_module(self):
+        module_name: str = self.query_one("#module_name_input").value
+        self.dismiss(module_name)
+
+    @on(Button.Pressed, "#cancel_button")
+    def cancel_rename(self):
+        self.dismiss(None)
+
 class ModulePane(TabPane):
     
     def __init__(self, module, *children, name = None, disabled = False):
         id = module.name.lower().replace(" ", "") + "_tab"
         super().__init__(module.name, *children, name=name, id=id, classes="module_tabs", disabled=disabled)
-        self.module = module
+        self.module: Module = module
         
 
     def compose(self):
@@ -157,8 +178,8 @@ class CocomoApp(App):
         ("n", "new_project", "New Project"),
         ("o", "open_project", "Open Project"),
         ("s", "save_project", "Save Project"),
-        ("r", "rename_project", "Rename Project"),
         ("a", "add_module", "Add Module"),
+        ("r", "rename_module", "Rename Module"),
     ]
     
     projects_directory = "projects"
@@ -182,7 +203,7 @@ class CocomoApp(App):
             yield Label("Schedule Factor")
             yield Static("")
             yield Static("")
-            yield Input(self.project.name, id="project_name", disabled=True)
+            yield Input(self.project.name, id="project_name")
             yield Select([(i.value, i) for i in RatingLevel], id="sched_select", value=self.project.schedule_factor, allow_blank=False)
             yield Button("Scale Factors")
             yield Button("Report")
@@ -223,10 +244,8 @@ class CocomoApp(App):
         self.query_one("#sched_select").value=self.project.schedule_factor
 
         modules: TabbedContent = self.query_one(TabbedContent)
-        module_list: str = ""
         await modules.clear_panes()
         for module in self.project.modules:
-            module_list += module.name + "\n"
             modules.add_pane(ModulePane(module))
 
         self.sub_title = self.project.name
@@ -261,6 +280,30 @@ class CocomoApp(App):
         module: Module = Module(f"Module {self.new_module_count}")
         self.project.add_module(module)
         self.query_one(TabbedContent).add_pane(ModulePane(module))
+
+    def action_rename_module(self):
+        modules: TabbedContent = self.query_one(TabbedContent)
+        current_pane: ModulePane = modules.active_pane
+        self.push_screen(ModuleRenameScreen(current_pane.module.name), self.rename_module_callback)
+        
+    async def rename_module_callback(self, new_name: str) -> None:
+        if new_name is None:
+            return
+        modules: TabbedContent = self.query_one(TabbedContent)
+        current_pane: ModulePane = modules.active_pane
+        
+        old_name: str = current_pane.module.name
+        current_pane.module.name = new_name
+        
+        for module in self.project.modules:
+            if module.name == old_name:
+                module.name = new_name
+                break
+        
+        await modules.clear_panes()
+        for module in self.project.modules:
+            modules.add_pane(ModulePane(module))
+        
 
     @on(Input.Submitted, "#project_name")
     @on(Input.Blurred, "#project_name")

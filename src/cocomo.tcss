@@ -103,3 +103,15 @@ LoadScreen > Container {
     width: 50%;
     height: 50%;
 }
+
+ScaleFactorScreen {
+    width: 50;
+    align: center middle;
+}
+
+ScaleFactorScreen > Container {
+    background: $boost;
+    border: thick $background;   
+    width: 50%;
+    height: 70%;
+}

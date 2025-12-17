@@ -11,7 +11,7 @@ from pathlib import Path
 import json
 
 from cocomo import Project, Module, ProjectEncoder
-from constants import RatingLevel, EffortModifier
+from constants import RatingLevel, EffortModifier, ScaleFactor
 
 class FileItem(ListItem):
 
@@ -122,6 +122,32 @@ class SaveScreen(ModalScreen[Path]):
         else:
             file_msg.update("")
 
+class ScaleFactorScreen(ModalScreen[str]):
+    def __init__(self, scale_factors: dict[ScaleFactor, RatingLevel], name = None, id = None, classes = None):
+        super().__init__(name, id, classes)
+        self.scale_factors: dict = scale_factors
+
+    def compose(self):
+        with Container():
+            for key, value in self.scale_factors.items():
+                with Horizontal():
+                    yield Label(key.name)
+                    yield Select([(i.value, i) for i in RatingLevel], value=value, 
+                                    allow_blank=False, id=key.name)
+            with Horizontal():
+                yield Button("OK", id="ok_button")
+                yield Button("Cancel", id="cancel_button")
+
+    @on(Button.Pressed, "#ok_button")
+    def set_scale_factors(self):
+        for key in self.scale_factors.keys():
+            self.scale_factors[key] = self.query_one(f"#{key.name}").value
+        self.dismiss("ok")
+
+    @on(Button.Pressed, "#cancel_button")
+    def cancel_scale_factors(self):
+        self.dismiss(None)
+
 class ModuleRenameScreen(ModalScreen[str]):
     def __init__(self, module_name: str, name = None, id = None, classes = None):
         super().__init__(name, id, classes)
@@ -205,7 +231,7 @@ class CocomoApp(App):
             yield Static("")
             yield Input(self.project.name, id="project_name")
             yield Select([(i.value, i) for i in RatingLevel], id="sched_select", value=self.project.schedule_factor, allow_blank=False)
-            yield Button("Scale Factors")
+            yield Button("Scale Factors", id="scale_factors_button")
             yield Button("Report")
             
             
@@ -316,7 +342,13 @@ class CocomoApp(App):
     @on(Select.Changed, "#sched_select")
     def select_schedule_factor(self):
         self.project.schedule_factor = RatingLevel(self.query_one("#sched_select").value)
+    
+    @on(Button.Pressed, "#scale_factors_button")
+    def edit_scale_factors(self):
+        self.push_screen(ScaleFactorScreen(self.project.scale_factors), self.scale_factors_callback)
 
+    def scale_factors_callback(self, result: str) -> None:
+        pass
 
 if __name__ == "__main__":
     CocomoApp().run()

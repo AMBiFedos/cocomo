@@ -334,9 +334,7 @@ class CocomoApp(App):
     @on(Input.Submitted, "#project_name")
     @on(Input.Blurred, "#project_name")
     def rename_project(self):
-        project_name = self.query_one("#project_name")
-        project_name.disabled=True
-        self.project.name = project_name.value
+        self.project.name = self.query_one("#project_name")
         self.sub_title = self.query_one("#project_name").value
         
     @on(Select.Changed, "#sched_select")

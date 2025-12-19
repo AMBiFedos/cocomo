@@ -6,7 +6,9 @@ from textual.widgets import Label, Input, Button, Select, TabPane, Rule, ListIte
 
 from pathlib import Path
 
+from cocomo import Module
 from constants import RatingLevel, EffortModifier, ScaleFactor
+
 
 class FileItem(ListItem):
 

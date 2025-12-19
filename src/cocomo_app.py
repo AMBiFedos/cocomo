@@ -158,10 +158,7 @@ class CocomoApp(App):
     
     @on(Button.Pressed, "#scale_factors_button")
     def edit_scale_factors(self):
-        self.push_screen(ScaleFactorScreen(self.project.scale_factors), self.scale_factors_callback)
-
-    def scale_factors_callback(self, result: str) -> None:
-        pass
+        self.push_screen(ScaleFactorScreen(self.project.scale_factors))
 
 if __name__ == "__main__":
     CocomoApp().run()

@@ -23,6 +23,7 @@ class CocomoApp(App):
         ("s", "save_project", "Save Project"),
         ("a", "add_module", "Add Module"),
         ("r", "rename_module", "Rename Module"),
+        ("u", "update_summary", "Update Summary"),
     ]
     
     projects_directory = "projects"
@@ -34,7 +35,8 @@ class CocomoApp(App):
         self.project.modules[0].sloc = 1000
         self.new_module_count: int = 1
         self.summary_str: str = ""
-        # self.build_results()
+        # self.build_summary()
+        self.sidebar: Markdown = Markdown(self.summary_str, id="sidebar")
 
     def on_mount(self):
         self.theme = "nord"
@@ -42,25 +44,27 @@ class CocomoApp(App):
     def compose(self) -> ComposeResult:
         yield Header()
         yield Footer()
+
+        with Horizontal():
+            with Vertical():
+                with Grid(id="project_header"):
+                    yield Label("Project Name")
+                    yield Label("Schedule Factor")
+                    yield Static("")
+                    yield Static("")
+                    yield Input(self.project.name, id="project_name")
+                    yield Select([(i.value, i) for i in RatingLevel], id="sched_select", value=self.project.schedule_factor, allow_blank=False)
+                    yield Button("Scale Factors", id="scale_factors_button")
+                    yield Button("Report")
+                    
+                    
+                with TabbedContent():
+                    for module in self.project.modules:
+                        yield ModulePane(module, self.sidebar)
+
+            yield self.sidebar
+    
         
-
-        with Grid(id="project_header"):
-            yield Label("Project Name")
-            yield Label("Schedule Factor")
-            yield Static("")
-            yield Static("")
-            yield Input(self.project.name, id="project_name")
-            yield Select([(i.value, i) for i in RatingLevel], id="sched_select", value=self.project.schedule_factor, allow_blank=False)
-            yield Button("Scale Factors", id="scale_factors_button")
-            yield Button("Report")
-            
-            
-        with TabbedContent():
-            for module in self.project.modules:
-                yield ModulePane(module)
-
-        yield Markdown(self.summary_str, id="sidebar")
-        self.build_results()
 
     async def action_new_project(self):
         self.project = Project("Untitled")
@@ -118,16 +122,18 @@ class CocomoApp(App):
 
     def action_rename_project(self):
         project_name = self.query_one("#project_name")
-        project_name.disabled=False
         self.set_focus(project_name, True)
 
     def action_add_module(self):
         self.new_module_count += 1
         module: Module = Module(f"Module {self.new_module_count}")
         module.sloc = 1000
-        self.new_module_count += 1
         self.project.add_module(module)
         self.query_one(TabbedContent).add_pane(ModulePane(module))
+
+    def action_update_summary(self):
+        self.build_summary()
+        self.sidebar.update(self.summary_str)
 
     def action_rename_module(self):
         modules: TabbedContent = self.query_one(TabbedContent)
@@ -152,7 +158,7 @@ class CocomoApp(App):
         for module in self.project.modules:
             modules.add_pane(ModulePane(module))
 
-    def build_results(self) -> None:
+    def build_summary(self) -> None:
         self.project.estimate_effort()
         results_heading = f"# {self.project.name} - Effort Estimate"
         summary_table = """
@@ -167,12 +173,11 @@ class CocomoApp(App):
         summary_table += f"| Project Total |  | **{self.project.nominal_effort:.2f}** |\n"
 
         self.summary_str = f"{results_heading}\n{summary_table}"
-        self.query_one("#sidebar").update(self.summary_str)
 
     @on(Input.Submitted, "#project_name")
     @on(Input.Blurred, "#project_name")
     def rename_project(self):
-        self.project.name = self.query_one("#project_name")
+        self.project.name = self.query_one("#project_name").value
         self.sub_title = self.query_one("#project_name").value
         
     @on(Select.Changed, "#sched_select")

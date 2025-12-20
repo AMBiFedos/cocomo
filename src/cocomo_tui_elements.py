@@ -2,7 +2,7 @@ from textual.app import ComposeResult
 from textual import on
 from textual.screen import ModalScreen
 from textual.containers import Horizontal, Vertical, Grid, Container
-from textual.widgets import Label, Input, Button, Select, TabPane, Rule, ListItem, ListView
+from textual.widgets import Label, Input, Button, Select, TabPane, Rule, ListItem, ListView, Markdown
 
 from pathlib import Path
 
@@ -168,11 +168,10 @@ class ModuleRenameScreen(ModalScreen[str]):
 
 class ModulePane(TabPane):
     
-    def __init__(self, module, *children, name = None, disabled = False):
+    def __init__(self, module: Module, *children, name = None, disabled = False):
         id = module.name.lower().replace(" ", "") + "_tab"
         super().__init__(module.name, *children, name=name, id=id, classes="module_tabs", disabled=disabled)
         self.module: Module = module
-        
 
     def compose(self):
         with Horizontal(id="sloc_group"):
@@ -191,3 +190,4 @@ class ModulePane(TabPane):
     @on(Select.Changed)
     def update_effort_modifier(self, event: Select.Changed):
         self.module.effort_modifiers[EffortModifier[event._sender.id]] = event._sender.value
+        

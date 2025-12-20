@@ -1,7 +1,7 @@
 from textual.app import App, ComposeResult
 from textual import on
 from textual.containers import Grid
-from textual.widgets import Label, Input, Button, Header, Footer, Select, TabbedContent, Static
+from textual.widgets import Label, Input, Button, Header, Footer, Select, TabbedContent, Markdown, Static
 
 from pathlib import Path
 import json
@@ -9,6 +9,8 @@ import json
 from cocomo import Project, Module
 from cocomo_tui_elements import *
 from constants import RatingLevel, EffortModifier, ScaleFactor
+
+
 
 class CocomoApp(App):
     CSS_PATH = "cocomo.tcss"
@@ -29,7 +31,10 @@ class CocomoApp(App):
         super().__init__()
         self.project: Project = Project("Untitled")
         self.project.add_module(Module("Module 1"))
+        self.project.modules[0].sloc = 1000
         self.new_module_count: int = 1
+        self.summary_str: str = ""
+        # self.build_results()
 
     def on_mount(self):
         self.theme = "nord"
@@ -54,13 +59,13 @@ class CocomoApp(App):
             for module in self.project.modules:
                 yield ModulePane(module)
 
-        
-        self.sidebar: Static = Static("\n\nPlaceholder", id="sidebar")
-        yield self.sidebar
-        
+        yield Markdown(self.summary_str, id="sidebar")
+        self.build_results()
+
     async def action_new_project(self):
         self.project = Project("Untitled")
         self.project.add_module(Module("Module 1"))
+        self.project.modules[0].sloc = 1000
         self.new_module_count = 1
         await self.refresh_values()
 
@@ -119,6 +124,8 @@ class CocomoApp(App):
     def action_add_module(self):
         self.new_module_count += 1
         module: Module = Module(f"Module {self.new_module_count}")
+        module.sloc = 1000
+        self.new_module_count += 1
         self.project.add_module(module)
         self.query_one(TabbedContent).add_pane(ModulePane(module))
 
@@ -144,7 +151,23 @@ class CocomoApp(App):
         await modules.clear_panes()
         for module in self.project.modules:
             modules.add_pane(ModulePane(module))
-        
+
+    def build_results(self) -> None:
+        self.project.estimate_effort()
+        results_heading = f"# {self.project.name} - Effort Estimate"
+        summary_table = """
+## Estimate Summary
+|     Module    |  SLOC  | Effort |
+|:-------------:|:------:|:------:|
+"""
+        for module in self.project.modules:
+            module.estimate_effort()
+            summary_table += f"| {module.name} | {module.sloc} | {module.nominal_effort:.2f} |\n"
+
+        summary_table += f"| Project Total |  | **{self.project.nominal_effort:.2f}** |\n"
+
+        self.summary_str = f"{results_heading}\n{summary_table}"
+        self.query_one("#sidebar").update(self.summary_str)
 
     @on(Input.Submitted, "#project_name")
     @on(Input.Blurred, "#project_name")

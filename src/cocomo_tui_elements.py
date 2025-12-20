@@ -190,4 +190,14 @@ class ModulePane(TabPane):
     @on(Select.Changed)
     def update_effort_modifier(self, event: Select.Changed):
         self.module.effort_modifiers[EffortModifier[event._sender.id]] = event._sender.value
-        
+    
+    @on(Input.Blurred, "#sloc_input")
+    @on(Input.Submitted, "#sloc_input")
+    def update_module_sloc(self, event: Input.Changed):
+        try:
+            new_sloc: int = int(event._sender.value)
+            if new_sloc < 0:
+                raise ValueError("SLOC cannot be negative")
+            self.module.sloc = new_sloc
+        except ValueError:
+            event._sender.value = str(self.module.sloc)

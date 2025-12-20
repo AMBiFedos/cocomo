@@ -107,6 +107,10 @@ class Project:
         for module in self.modules:
             aggregate_sloc += module.sloc
         
+        if aggregate_sloc == 0:
+            self.nominal_effort = 0.0
+            return
+        
         scale_factor_sum = 0
         for key, value in self.scale_factors.items():
             scale_factor_sum += SCALE_FACTOR_VALUES[key][value]

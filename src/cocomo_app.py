@@ -23,7 +23,9 @@ class CocomoApp(App):
         ("s", "save_project", "Save Project"),
         ("a", "add_module", "Add Module"),
         ("r", "rename_module", "Rename Module"),
+        ("d", "delete_module", "Delete Module"),
         ("u", "update_summary", "Update Summary"),
+        ("e", "export_summary",)
     ]
     
     projects_directory = "projects"
@@ -35,7 +37,6 @@ class CocomoApp(App):
         self.project.modules[0].sloc = 1000
         self.new_module_count: int = 1
         self.summary_str: str = ""
-        # self.build_summary()
         self.sidebar: Markdown = Markdown(self.summary_str, id="sidebar")
 
     def on_mount(self):
@@ -64,7 +65,6 @@ class CocomoApp(App):
 
             yield self.sidebar
     
-        
 
     async def action_new_project(self):
         self.project = Project("Untitled")
@@ -130,6 +130,16 @@ class CocomoApp(App):
         module.sloc = 1000
         self.project.add_module(module)
         self.query_one(TabbedContent).add_pane(ModulePane(module))
+
+    def action_delete_module(self):
+        module_pane: ModulePane = self.query_one(TabbedContent).active_pane
+        
+        for i in range(len(self.project.modules)):
+            if self.project.modules[i] is module_pane.module:
+                self.project.remove_module(i)
+                break
+
+        self.query_one(TabbedContent).remove_pane(self.query_one(TabbedContent).active)
 
     def action_update_summary(self):
         self.build_summary()

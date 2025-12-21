@@ -1,6 +1,11 @@
+# Contains constants and enumerations used in the COCOMO II.2000 model
+# All default values are taken from the COCOMO documentation.
+
 from enum import Enum
 
 # Default model calibrated values
+# The variable names are taken from the COCOMO II.2000 model they are coefficients in the effort estimation equations
+# The values can be found on page 14
 A: float = 2.94
 B: float = 0.91
 C: float = 3.67
@@ -69,8 +74,6 @@ EFFORT_MODIFIER_COST_DRIVERS = {
 }
 
 SCHEDULE_COST_DRIVER = {RatingLevel.VERY_LOW: 1.43, RatingLevel.LOW: 0.92, RatingLevel.NOMINAL: 1.00, RatingLevel.HIGH: 1.26, RatingLevel.VERY_HIGH: 1.26, RatingLevel.EXTRA_HIGH: 1.24}
-
-
 
 class Language(Enum):
     Access = "Access"

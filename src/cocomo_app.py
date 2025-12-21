@@ -11,7 +11,7 @@ from cocomo_tui_elements import *
 from constants import RatingLevel
 
 
-
+# This is a heavily simplified layout. Need to explore better options in the future.
 class CocomoApp(App):
     CSS_PATH = "cocomo.tcss"
     TITLE = "COCOMO II.2000"    
@@ -25,7 +25,7 @@ class CocomoApp(App):
         ("r", "rename_module", "Rename Module"),
         ("d", "delete_module", "Delete Module"),
         ("u", "update_summary", "Update Summary"),
-        # ("e", "export_summary",)
+        # ("e", "export_summary",) # Export Summary - future feature; need to figure out how to do this.
     ]
     
     projects_directory = "projects"
@@ -35,8 +35,9 @@ class CocomoApp(App):
         self.project: Project = Project("Untitled")
         self.project.add_module(Module("Module 1"))
         self.project.modules[0].sloc = 1000
-        self.new_module_count: int = 1
+        self.new_module_count: int = 1 # This variable keeps track of how many modules have been added for default naming.
         self.summary_str: str = ""
+        
         self.sidebar: Markdown = Markdown(self.summary_str, id="sidebar")
 
     def on_mount(self):
@@ -51,20 +52,21 @@ class CocomoApp(App):
                 with Grid(id="project_header"):
                     yield Label("Project Name")
                     yield Label("Schedule Factor")
-                    yield Static("")
-                    yield Static("")
+                    
+                    yield Static("") # I'm too tired to figure out how to space the grid
+                    yield Static("") # so using empty Static objects for now.
+                    
+                    # I went back and forth on whether to have the Input disabled on startup, went with enabled for now.
                     yield Input(self.project.name, id="project_name")
                     yield Select([(i.value, i) for i in RatingLevel], id="sched_select", value=self.project.schedule_factor, allow_blank=False)
                     yield Button("Scale Factors", id="scale_factors_button")
-                    yield Button("Report")
-                    
+                    yield Button("Report", disabled=True) 
                     
                 with TabbedContent():
                     for module in self.project.modules:
                         yield ModulePane(module, self.sidebar)
 
             yield self.sidebar
-    
 
     async def action_new_project(self):
         self.project = Project("Untitled")
@@ -134,6 +136,8 @@ class CocomoApp(App):
     def action_delete_module(self):
         module_pane: ModulePane = self.query_one(TabbedContent).active_pane
         
+        # There is no way to know which number in the Project.modules list this module corresponds to,
+        # so we have to search for it. 
         for i in range(len(self.project.modules)):
             if self.project.modules[i] is module_pane.module:
                 self.project.remove_module(i)
@@ -141,6 +145,7 @@ class CocomoApp(App):
 
         self.query_one(TabbedContent).remove_pane(self.query_one(TabbedContent).active)
 
+    # I tried to make this automatic, but Textual would not update the Markdown widget.
     def action_update_summary(self):
         self.build_summary()
         self.sidebar.update(self.summary_str)
@@ -156,11 +161,9 @@ class CocomoApp(App):
         modules: TabbedContent = self.query_one(TabbedContent)
         current_pane: ModulePane = modules.active_pane
         
-        old_name: str = current_pane.module.name
         current_pane.module.name = new_name
-        
         for module in self.project.modules:
-            if module.name == old_name:
+            if module is current_pane.module:
                 module.name = new_name
                 break
         
@@ -168,6 +171,7 @@ class CocomoApp(App):
         for module in self.project.modules:
             modules.add_pane(ModulePane(module))
 
+    # A really basic summary for now.
     def build_summary(self) -> None:
         self.project.estimate_effort()
         results_heading = f"# {self.project.name} - Effort Estimate"

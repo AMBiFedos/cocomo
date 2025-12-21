@@ -26,12 +26,14 @@ class Module:
             EffortModifier.TOOL: RatingLevel.NOMINAL,
             EffortModifier.SITE: RatingLevel.NOMINAL,
         }
-        self.em_prod: float = 1.0
+
         self.function_points: int = 0
         self.language: Language = Language.C
+        
         self.nominal_effort: float = 0.0
         self.nominal_schedule: float = 0.0
 
+    # The Nomainal Effort Estimation Equation is found on page 13 of the COCOMO II.2000 documentation
     def estimate_effort(self):
         effort_modifier_prod: float = 1.0
         for key, value in self.effort_modifiers.items():
@@ -56,6 +58,7 @@ class Module:
     def function_points_to_sloc(self) -> None:
         self.sloc = self.function_points * FUNCTION_POINT_LANGUAGE_RATIOS[self.language]
 
+    # JSON related methods are below
     def encode(self):
         return ModuleEncoder().default(self)
 
@@ -101,11 +104,13 @@ class Project:
         module: Module = self.modules.pop(old_position)
         self.modules.insert(new_position, module)
 
+    # Multiple Module Effort Estimation Equation starts on page 55 of the COCOMO II.2000 documentation
     def estimate_effort(self):
         aggregate_sloc: int = 0
         for module in self.modules:
             aggregate_sloc += module.sloc
         
+        # To prevent divide by zero errors
         if aggregate_sloc == 0:
             self.nominal_effort = 0.0
             return
@@ -130,6 +135,7 @@ class Project:
 
         self.nominal_effort = aggregate_basic_effort
 
+    # JSON related methods are below
     def encode(self):
         return ProjectEncoder().default(self)
     

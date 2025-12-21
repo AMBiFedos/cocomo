@@ -25,7 +25,7 @@ class CocomoApp(App):
         ("r", "rename_module", "Rename Module"),
         ("d", "delete_module", "Delete Module"),
         ("u", "update_summary", "Update Summary"),
-        ("e", "export_summary",)
+        # ("e", "export_summary",)
     ]
     
     projects_directory = "projects"

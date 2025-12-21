@@ -2,7 +2,7 @@ from textual.app import ComposeResult
 from textual import on
 from textual.screen import ModalScreen
 from textual.containers import Horizontal, Vertical, Grid, Container
-from textual.widgets import Label, Input, Button, Select, TabPane, Rule, ListItem, ListView, Markdown
+from textual.widgets import Label, Input, Button, Select, TabPane, Rule, ListItem, ListView
 
 from pathlib import Path
 

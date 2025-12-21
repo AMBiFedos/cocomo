@@ -8,7 +8,7 @@ import json
 
 from cocomo import Project, Module
 from cocomo_tui_elements import *
-from constants import RatingLevel, EffortModifier, ScaleFactor
+from constants import RatingLevel
 
 
 
